@@ -1,8 +1,9 @@
 from sqlalchemy import BigInteger
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy.ext.asyncio import AsyncAttrs
 
 
-class Base(DeclarativeBase):
+class Base(AsyncAttrs, DeclarativeBase):
     """ BaseClass for declaring other tables """
     # same ID for all Tables
     # for Tables with different ID: you can override 'id' attribute

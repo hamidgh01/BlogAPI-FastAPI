@@ -4,22 +4,22 @@ from typing import Annotated
 from contextlib import asynccontextmanager
 
 from fastapi import (
-    FastAPI, status, HTTPException,
-    Query, Path,  # Form, Body,
-    File, UploadFile,
+    FastAPI,  # status, HTTPException,
+    # Query, Path, Form, Body,
+    # File, UploadFile,
     Depends
 )
-from fastapi.responses import JSONResponse  # RedirectResponse
+# from fastapi.responses import JSONResponse  # RedirectResponse
 
-from sqlalchemy import select  # update, delete
-from sqlalchemy.orm import Session
+# from sqlalchemy import select  # update, delete
+from sqlalchemy.ext.asyncio import AsyncSession
 
-from users.routes import router as user_routes
-from blog.routes import router as blog_routes
+# from users.routes import router as user_routes
+# from blog.routes import router as blog_routes
 
 # from app1.models import *
 # from app2.models import *
-from core.database import get_db
+from src.core.database import get_db
 
 
 @asynccontextmanager
@@ -40,9 +40,9 @@ async def lifespan(application: FastAPI):
 
 # app = FastAPI(lifespan=lifespan)
 app = FastAPI(
-    title="My API",
+    title="Blog API - FastAPI",
     lifespan=lifespan,
-    docs_url="/docs",  # Argument equals to the default parameter value (I disabled the inspection)
+    docs_url="/docs",  # Argument equals to the default parameter value (inspection disabled)
     redoc_url="/redoc",  # ...
     openapi_url="/openapi.json",  # ...
     swagger_ui_parameters={"syntaxHighlight.theme": "monokai"}  # forces asset load
@@ -62,7 +62,10 @@ app = FastAPI(
 #     ...
 
 
+@app.get("/")
+async def home(db: Annotated[AsyncSession, Depends(get_db)]):
+    return "Hello world!"
 #
 
-app.include_router(user_routes)
-app.include_router(blog_routes)
+# app.include_router(user_routes)
+# app.include_router(blog_routes)
