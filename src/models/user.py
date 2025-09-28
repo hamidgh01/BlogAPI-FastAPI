@@ -1,7 +1,7 @@
 from datetime import datetime
 
 from sqlalchemy import String, DateTime, Boolean, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 
@@ -19,7 +19,7 @@ class User(Base):
             _ 'email' is verified via Pydantic Schemas
 
         Relations:
-
+            _ 1:N (One to Many) with 'Post' -> User.posts / Post.author
         """
 
     __tablename__ = "users"
@@ -43,3 +43,6 @@ class User(Base):
         default=func.now(),
         onupdate=func.now()
     )
+
+    # 1:N with Post
+    posts = relationship("Post", backref="author")
