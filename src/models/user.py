@@ -8,19 +8,19 @@ from .base import Base
 
 class User(Base):
     """
-        Table/Model: User (users)
-        Fields:
-            id, username, password, email,
-            is_active, is_superuser, date_joined, updated_at
+    Table/Model: User (users)
+    Fields:
+        id (PK), username, password, email,
+        is_active, is_superuser, date_joined, updated_at
 
-        Points/Notes:
-            _ 'password' isn't stored in plain text. its hashed-value
-              will be stored in database.
-            _ 'email' is verified via Pydantic Schemas
+    Points/Notes:
+        _ 'password' isn't stored in plain text. its hashed-value
+          will be stored in database.
+        _ 'email' is verified via Pydantic Schemas
 
-        Relations:
-            _ 1:N (One to Many) with 'Post' -> User.posts / Post.author
-        """
+    Relations:
+        _ 1:N (One to Many) with 'Post' -> User.posts / Post.author
+    """
 
     __tablename__ = "users"
 

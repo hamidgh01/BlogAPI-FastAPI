@@ -5,9 +5,10 @@ from sqlalchemy import (
     String, Text, SmallInteger, BigInteger, DateTime,
     ForeignKey, func, Enum as SqlEnum
 )
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from .tag import posts_tags
 
 
 class PostStatus(PythonEnum):
@@ -21,8 +22,8 @@ class Post(Base):
     """
     Table/Model: Post (posts)
     Fields:
-        id, title, slug, content, reading_time,
-        status, created_at, published_at, updated_at
+        id (PK), title, slug, content, reading_time, status,
+        created_at, published_at, updated_at, user_id (FK)
 
     Points/Notes:
         _ 'slug' is generated via 'title' [calculated_field]
@@ -31,6 +32,8 @@ class Post(Base):
 
     Relations:
         _ N:1 (Many to One) with 'User' -> Post.author / User.posts
+        _ N:N (Many to Many) with 'Tag' -> Post.tags / Tag.posts
+          (via posts_tags association table)
     """
 
     __tablename__ = "posts"
@@ -66,5 +69,12 @@ class Post(Base):
     )
     # NOTE: because of using 'backref="author"' in referenced table 'User',
     # you don't need to define 'relationship(...)'
+
+    # N:N with Tag
+    tags = relationship(
+        "Tag",
+        secondary=posts_tags,
+        back_populates="posts"
+    )
 
     # ToDo: if for a user: is_active=False --> his posts should be hidden too.
