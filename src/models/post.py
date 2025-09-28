@@ -41,9 +41,9 @@ class Post(Base):
         nullable=False,
         index=True
     )
-    slug: Mapped[str] = mapped_column(String)
-    content: Mapped[str] = mapped_column(Text)
-    reading_time: Mapped[int] = mapped_column(SmallInteger)
+    slug: Mapped[str] = mapped_column(String, nullable=True)
+    content: Mapped[str] = mapped_column(Text, nullable=True)
+    reading_time: Mapped[int] = mapped_column(SmallInteger, nullable=True)
     status: Mapped[PostStatus] = mapped_column(
         SqlEnum(PostStatus, name="post_status_enum"),
         default=PostStatus.DR, nullable=False
