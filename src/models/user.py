@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .post import Post
 from .comment import Comment
+from .lists import List
 
 
 class User(Base):
@@ -23,6 +24,7 @@ class User(Base):
     Relations:
         _ 1:N (One to Many) with 'Post' -> User.posts / Post.author
         _ 1:N (One to Many) with 'Comment' -> User.comment / Comment.commenter
+        _ 1:N with 'List' (owned-lists) -> User.owned_lists / List.owner
     """
 
     __tablename__ = "users"
@@ -54,4 +56,8 @@ class User(Base):
     # 1:N with Comment
     comments: Mapped[Comment] = relationship(
         "Comment", backref="commenter"
+    )
+    # 1:N with List (owned-lists)
+    owned_lists: Mapped[List] = relationship(
+        "List", backref="owner"
     )

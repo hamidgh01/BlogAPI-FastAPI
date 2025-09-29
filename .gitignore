@@ -49,9 +49,7 @@ build/
 # ...
 Project Structure Guide.txt
 /.$ToDoApp.drawio.bkp
-*.drawio
-*.drawio.bkp
-/.$ToDoApp.drawio.dtmp
+*.drawio*
 /src/authentication
 notes.txt
 src/.flake8
