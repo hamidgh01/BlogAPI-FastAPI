@@ -10,6 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .tag import posts_tags
 from .comment import Comment
+from .lists import saved_posts
 
 
 class PostStatus(PythonEnum):
@@ -32,10 +33,12 @@ class Post(Base):
         _ 'reading_time' is generated via 'content' [calculated_field]
 
     Relations:
-        _ N:1 (Many to One) with 'User' -> Post.author / User.posts
-        _ N:N (Many to Many) with 'Tag' -> Post.tags / Tag.posts
-          (via posts_tags association table)
-        _ 1:N (One to Many) with 'Comment' -> Post.comments / Comment.post
+    _ N:1 (Many to One) with 'User' -> Post.author / User.posts
+    _ N:N (Many to Many) with 'Tag' -> Post.tags / Tag.posts
+      (via 'posts_tags' association table)
+    _ 1:N (One to Many) with 'Comment' -> Post.comments / Comment.post
+    _ N:N (Many to Many) with 'List' -> Post.lists / List.posts
+      (via 'saved_posts' association table)
     """
 
     __tablename__ = "posts"
@@ -56,7 +59,7 @@ class Post(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now()
     )
-    published_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    published_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)  # ToDo: I'll possibly index this column
     updated_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=func.now(),
@@ -83,8 +86,13 @@ class Post(Base):
         secondary=posts_tags,
         back_populates="posts"
     )
-
     # 1:N with Comment
     comments: Mapped[Comment] = relationship("Comment", backref="post")
+    # N:N with List
+    lists = relationship(
+        "List",
+        secondary=saved_posts,
+        back_populates="posts"
+    )
 
     # ToDo: if for a user: is_active=False --> his posts should be hidden too.

@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from .post import Post
 from .comment import Comment
-from .lists import List
+from .lists import List, user_saved_lists
 
 
 class User(Base):
@@ -22,9 +22,12 @@ class User(Base):
         _ 'email' is verified via Pydantic Schemas
 
     Relations:
-        _ 1:N (One to Many) with 'Post' -> User.posts / Post.author
-        _ 1:N (One to Many) with 'Comment' -> User.comment / Comment.commenter
-        _ 1:N with 'List' (owned-lists) -> User.owned_lists / List.owner
+    _ 1:N (One to Many) with 'Post' -> User.posts / Post.author
+    _ 1:N (One to Many) with 'Comment' -> User.comment / Comment.commenter
+    _ 1:N with 'List' (owned-lists) -> User.owned_lists / List.owner
+    _ N:N (Many to Many) with 'List' (saved-lists)
+      -> User.saved_lists / List.users_who_saved_this_list
+      (via 'user_saved_lists' association table)
     """
 
     __tablename__ = "users"
@@ -60,4 +63,10 @@ class User(Base):
     # 1:N with List (owned-lists)
     owned_lists: Mapped[List] = relationship(
         "List", backref="owner"
+    )
+    # N:N with List
+    saved_lists = relationship(
+        "List",
+        secondary=user_saved_lists,
+        back_populates="users_who_saved_this_list"
     )
