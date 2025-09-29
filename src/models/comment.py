@@ -19,8 +19,8 @@ class Comment(Base):
     """
     Table/Model: Comment (comments)
     Fields:
-        id (PK), content, created_at, updated_at,
-        status, post_id (FK), user_id (FK)
+        id (PK), content, created_at, updated_at, status,
+        post_id (FK), user_id (FK), comment_parent_id (Self-Referenced)
 
     Points/Notes:
         parent of a comment can be another 'comment' or a 'post'.
@@ -72,7 +72,8 @@ class Comment(Base):
             name="fk_posts_comments",
             ondelete="CASCADE"
         ),
-        nullable=True  # NOTE: explained docstring
+        nullable=True,  # NOTE: explained docstring
+        index=True
     )
     # N:1 with Comment (Self-Referencing) (nullable)
     comment_parent_id: Mapped[int | None] = mapped_column(
@@ -82,7 +83,8 @@ class Comment(Base):
             name="fk_comments_reply_comments",
             ondelete="CASCADE"
         ),
-        nullable=True  # NOTE: explained docstring
+        nullable=True,  # NOTE: explained docstring
+        index=True
     )
     # Self-referencing relationship
     parent: Mapped["Comment"] = relationship(

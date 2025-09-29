@@ -71,7 +71,8 @@ class Post(Base):
             name="fk_users_posts",
             ondelete="CASCADE"
         ),
-        nullable=False
+        nullable=False,
+        index=True
     )
     # NOTE: because of using 'backref="author"' in referenced table 'User',
     # you don't need to define 'relationship(...)' here.
