@@ -9,6 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from .tag import posts_tags
+from .comment import Comment
 
 
 class PostStatus(PythonEnum):
@@ -34,6 +35,7 @@ class Post(Base):
         _ N:1 (Many to One) with 'User' -> Post.author / User.posts
         _ N:N (Many to Many) with 'Tag' -> Post.tags / Tag.posts
           (via posts_tags association table)
+        _ 1:N (One to Many) with 'Comment' -> Post.comments / Comment.post
     """
 
     __tablename__ = "posts"
@@ -64,11 +66,15 @@ class Post(Base):
     # N:1 with User (backref: author)
     user_id: Mapped[int] = mapped_column(
         BigInteger,
-        ForeignKey("users.id", name="fk_users_posts", ondelete="CASCADE"),
+        ForeignKey(
+            "users.id",
+            name="fk_users_posts",
+            ondelete="CASCADE"
+        ),
         nullable=False
     )
     # NOTE: because of using 'backref="author"' in referenced table 'User',
-    # you don't need to define 'relationship(...)'
+    # you don't need to define 'relationship(...)' here.
 
     # N:N with Tag
     tags = relationship(
@@ -76,5 +82,8 @@ class Post(Base):
         secondary=posts_tags,
         back_populates="posts"
     )
+
+    # 1:N with Comment
+    comments: Mapped[Comment] = relationship("Comment", backref="post")
 
     # ToDo: if for a user: is_active=False --> his posts should be hidden too.
