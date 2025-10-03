@@ -10,7 +10,7 @@ from .post import Post
 from .comment import Comment
 from .lists import List, user_saved_lists
 from .ticket import Ticket
-from .report import ReportOnUser
+from .report import ReportOnUser, ReportOnPost
 
 
 class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
@@ -39,6 +39,9 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
           -> User.reports_on_users / ReportOnUser.reporter
         _ 1:N (One to Many) with 'ReportOnUser' (as reported_user)
           -> User.received_reports / ReportOnUser.reported_user
+    relation with 'ReportOnPost':
+        _ 1:N (One to Many) with 'ReportOnPost' (as reporter)
+          -> User.reports_on_posts / ReportOnPost.reporter
     """
 
     __tablename__ = "users"
@@ -92,5 +95,10 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     # 1:N with ReportOnUser (as reported_user)
     received_reports: Mapped[ReportOnUser] = relationship(
         "ReportOnUser", backref="reported_user"
+    )
+    # ---------------------------------------
+    # 1:N with ReportOnPost (as reporter)
+    reports_on_posts: Mapped[ReportOnPost] = relationship(
+        "ReportOnPost", backref="reporter"
     )
     # ------------------------------------------------------

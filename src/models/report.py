@@ -14,7 +14,7 @@ class _BaseReport:
         String(length=1000), nullable=True
     )
     # N:1 with User (as reporter)
-    # (`backref` in ReportOnUser: "reporter")
+    # (`backref` in both ReportOnUser and ReportOnPost: "reporter")
     reporter_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(
@@ -59,7 +59,10 @@ class ReportOnUser(Base, _BaseReport, CreatedAtFieldMixin):
     __tablename__ = "reports_on_users"
 
     title: Mapped[UserReportTitleChoices] = mapped_column(
-        SqlEnum(UserReportTitleChoices, name="user_report_title_choices_enum"),
+        SqlEnum(
+            UserReportTitleChoices,
+            name="user_report_title_choices_enum"
+        ),
         nullable=False
     )
 
@@ -69,6 +72,54 @@ class ReportOnUser(Base, _BaseReport, CreatedAtFieldMixin):
         ForeignKey(
             "users.id",
             name="fk_users_reports_for_reported_users",
+            ondelete="CASCADE"
+        ),
+        nullable=False,
+        index=True
+    )
+
+
+class PostReportTitleChoices(PythonEnum):
+    R1 = "Post-Report Reason 1"
+    R2 = "Post-Report Reason 2"
+    R3 = "Post-Report Reason 3"
+    R4 = "Post-Report Reason 4"
+    R5 = "Post-Report Reason 5"
+    R6 = "Post-Report Reason 6"
+    OT = "Other"
+
+
+class ReportOnPost(Base, _BaseReport, CreatedAtFieldMixin):
+    """
+    Table/Model: ReportOnPost (reports_on_posts)
+
+    Fields:
+        id (PK), title, description, reporter_id (FK),
+        created_at, reported_post_id (FK)
+
+    Relations:
+    _ N:1 (Many to One) with 'User' (as reporter)
+      -> ReportOnPost.reporter / User.reports_on_posts
+    _ N:1 (Many to One) with 'Post'
+      -> ReportOnPost.reported_post / ReportOnPost.received_reports
+    """
+
+    __tablename__ = "reports_on_posts"
+
+    title: Mapped[PostReportTitleChoices] = mapped_column(
+        SqlEnum(
+            PostReportTitleChoices,
+            name="post_report_title_choices_enum"
+        ),
+        nullable=False
+    )
+
+    # N:1 with Post (backref: reported_post)
+    reported_post_id: Mapped[int | None] = mapped_column(
+        BigInteger,
+        ForeignKey(
+            "posts.id",
+            name="fk_posts_reports",
             ondelete="CASCADE"
         ),
         nullable=False,

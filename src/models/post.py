@@ -12,6 +12,7 @@ from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 from .tag import posts_tags
 from .comment import Comment
 from .lists import saved_posts
+from .report import ReportOnPost
 
 
 class PostStatus(PythonEnum):
@@ -40,6 +41,8 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     _ 1:N (One to Many) with 'Comment' -> Post.comments / Comment.post
     _ N:N (Many to Many) with 'List' -> Post.lists / List.posts
       (via 'saved_posts' association table)
+    _ 1:N (One to Many) with 'ReportOnPost'
+      ->  Post.received_reports / ReportOnPost.reported_post
     """
 
     __tablename__ = "posts"
@@ -86,6 +89,10 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         "List",
         secondary=saved_posts,
         back_populates="posts"
+    )
+    # 1:N with ReportOnPost
+    received_reports: Mapped[ReportOnPost] = relationship(
+        "ReportOnPost", backref="reported_post"
     )
 
     # ToDo: if for a user: is_active=False --> his posts should be hidden too.
