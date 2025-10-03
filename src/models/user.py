@@ -9,6 +9,7 @@ from .profile import Profile
 from .post import Post
 from .comment import Comment
 from .lists import List, user_saved_lists
+from .ticket import Ticket
 
 
 class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
@@ -31,6 +32,7 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     _ N:N (Many to Many) with 'List' (saved-lists)
       -> User.saved_lists / List.users_who_saved_this_list
       (via 'user_saved_lists' association table)
+    _ 1:N (One to Many) with 'Ticket' -> User.tickets / Ticket.sender
     """
 
     __tablename__ = "users"
@@ -71,4 +73,8 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     # 1:1 with Profile
     profile: Mapped[Profile] = relationship(
         "Profile", backref="user", uselist=False
+    )
+    # 1:N with Ticket
+    tickets: Mapped[Ticket] = relationship(
+        "Ticket", backref="sender"
     )
