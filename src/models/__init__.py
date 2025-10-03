@@ -7,6 +7,8 @@ from .post import Post
 from .tag import Tag, posts_tags
 from .comment import Comment
 from .lists import List, saved_posts, user_saved_lists
+from .ticket import Ticket
+from .report import ReportOnUser
 
 __all__ = [
     "Base",
@@ -18,5 +20,7 @@ __all__ = [
     "posts_tags",
     "List",
     "saved_posts",
-    "user_saved_lists"
+    "user_saved_lists",
+    "Ticket",
+    "ReportOnUser",
 ]

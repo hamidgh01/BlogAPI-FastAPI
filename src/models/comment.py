@@ -62,7 +62,7 @@ class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
             name="fk_posts_comments",
             ondelete="CASCADE"
         ),
-        nullable=True,  # NOTE: explained docstring
+        nullable=True,  # NOTE: explained in docstring
         index=True
     )
     # N:1 with Comment (Self-Referencing) (nullable)
@@ -73,7 +73,7 @@ class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
             name="fk_comments_reply_comments",
             ondelete="CASCADE"
         ),
-        nullable=True,  # NOTE: explained docstring
+        nullable=True,  # NOTE: explained in docstring
         index=True
     )
     # Self-referencing relationship
