@@ -1,4 +1,6 @@
-from sqlalchemy import String, Boolean, ForeignKey, Table, Column, BigInteger
+from sqlalchemy import (
+    BigInteger, String, Boolean, DateTime, func, ForeignKey, Table, Column
+)
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
@@ -22,6 +24,11 @@ saved_posts = Table(
         nullable=False,
         primary_key=True
     ),
+    Column(
+        name="saved_date",
+        type_=DateTime,
+        server_default=func.now()
+    )
 )
 # NOTE: 'primary_key=True' in both columns --> makes a composite_key of them
 
@@ -43,6 +50,11 @@ user_saved_lists = Table(
         nullable=False,
         primary_key=True
     ),
+    Column(
+        name="saved_date",
+        type_=DateTime,
+        server_default=func.now()
+    )
 )
 
 
