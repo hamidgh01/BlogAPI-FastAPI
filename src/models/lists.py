@@ -1,12 +1,8 @@
-from datetime import datetime
-
-from sqlalchemy import (
-    String, DateTime, Boolean, ForeignKey, func,
-    Table, Column, BigInteger
-)
+from sqlalchemy import String, Boolean, ForeignKey, Table, Column, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 
 
 # 'saved_posts' association table -> M2M between 'posts' and 'lists'.
@@ -50,7 +46,7 @@ user_saved_lists = Table(
 )
 
 
-class List(Base):
+class List(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     """
     Table/Model: List (lists)
     Fields:
@@ -74,12 +70,6 @@ class List(Base):
         String(length=1000), nullable=True
     )
     is_private: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime, default=func.now(), onupdate=func.now()
-    )
 
     # N:1 with User (backref: owner)
     user_id: Mapped[int] = mapped_column(

@@ -1,13 +1,13 @@
 from enum import Enum as PythonEnum
-from datetime import datetime, date
+from datetime import date
 
 from sqlalchemy import (
-    String, BigInteger, DateTime, Date,
-    ForeignKey, Index, func, Enum as SqlEnum
+    String, BigInteger, Date, ForeignKey, Index, Enum as SqlEnum
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from ._mixins import UpdateAtFieldMixin
 
 
 class Link(Base):
@@ -49,7 +49,7 @@ class Gender(PythonEnum):
     NS = "Not-Specified"
 
 
-class Profile(Base):
+class Profile(Base, UpdateAtFieldMixin):
     """
     Table/Model: Profile (profiles)
     Fields:
@@ -92,11 +92,8 @@ class Profile(Base):
     gender: Mapped[Gender] = mapped_column(
         SqlEnum(Gender, name="profile_gender_enum"), default=Gender.NS
     )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=func.now(),
-        onupdate=func.now()
-    )
+    # ToDo: add a 'created_at' field with default_factory=(a factory with
+    #  this result: the value of 'created_at' field of its related user)
     # profile_photo: Mapped[...]  # ToDo: implement this later
 
     # 1:N with Link

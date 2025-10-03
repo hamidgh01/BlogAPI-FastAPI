@@ -1,13 +1,8 @@
-from datetime import datetime
-
-from sqlalchemy import (
-    String, DateTime, ForeignKey, func,
-    Table, Column, PrimaryKeyConstraint
-)
+from sqlalchemy import String, ForeignKey, Table, Column, PrimaryKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
-
+from ._mixins import CreatedAtFieldMixin
 
 # 'posts_tags' association table to implement ManyToMany relationship
 # between 'Posts' and 'Tags'.
@@ -32,7 +27,7 @@ posts_tags = Table(
 )
 
 
-class Tag(Base):
+class Tag(Base, CreatedAtFieldMixin):
     """
     Table/Model: Tag (tags)
     Fields:
@@ -47,9 +42,6 @@ class Tag(Base):
     # id (defined in Base)
     name: Mapped[str] = mapped_column(
         String(120), nullable=False, unique=True, index=True
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
     )
 
     # N:N with Post

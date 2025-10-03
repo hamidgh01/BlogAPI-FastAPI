@@ -3,11 +3,12 @@ from datetime import datetime
 
 from sqlalchemy import (
     String, Text, SmallInteger, BigInteger, DateTime,
-    ForeignKey, func, Enum as SqlEnum
+    ForeignKey, Enum as SqlEnum
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 from .tag import posts_tags
 from .comment import Comment
 from .lists import saved_posts
@@ -20,7 +21,7 @@ class PostStatus(PythonEnum):
     DL = "Deleted-By-Author"
 
 
-class Post(Base):
+class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     """
     Table/Model: Post (posts)
     Fields:
@@ -56,15 +57,7 @@ class Post(Base):
         SqlEnum(PostStatus, name="post_status_enum"),
         default=PostStatus.DR, nullable=False
     )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
-    )
     published_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)  # ToDo: I'll possibly index this column
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=func.now(),
-        onupdate=func.now()
-    )
 
     # N:1 with User (backref: author)
     user_id: Mapped[int] = mapped_column(

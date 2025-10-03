@@ -1,16 +1,17 @@
 from datetime import datetime
 
-from sqlalchemy import String, DateTime, Boolean, func
+from sqlalchemy import String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 from .profile import Profile
 from .post import Post
 from .comment import Comment
 from .lists import List, user_saved_lists
 
 
-class User(Base):
+class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     """
     Table/Model: User (users)
     Fields:
@@ -45,14 +46,9 @@ class User(Base):
     email: Mapped[str] = mapped_column(String, nullable=False, unique=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
-    date_joined: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=func.now(),
-        onupdate=func.now()
-    )
+
+    date_joined: Mapped[datetime] = CreatedAtFieldMixin.created_at  # alias
+    created_at = None
 
     # 1:N with Post
     posts: Mapped[Post] = relationship(

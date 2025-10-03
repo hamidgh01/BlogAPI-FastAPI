@@ -1,12 +1,10 @@
 from enum import Enum as PythonEnum
-from datetime import datetime
 
-from sqlalchemy import (
-    BigInteger, String, DateTime, ForeignKey, func, Enum as SqlEnum
-)
+from sqlalchemy import BigInteger, String, ForeignKey, Enum as SqlEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 
 
 class CommentStatus(PythonEnum):
@@ -15,7 +13,7 @@ class CommentStatus(PythonEnum):
     DL = "Deleted-By-Commenter"
 
 
-class Comment(Base):
+class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     """
     Table/Model: Comment (comments)
     Fields:
@@ -44,14 +42,6 @@ class Comment(Base):
     status: Mapped[CommentStatus] = mapped_column(
         SqlEnum(CommentStatus, name="comment_status_enum"),
         default=CommentStatus.PB, nullable=False
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, server_default=func.now()
-    )
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=func.now(),
-        onupdate=func.now()
     )
 
     # N:1 with User (backref: commenter)
