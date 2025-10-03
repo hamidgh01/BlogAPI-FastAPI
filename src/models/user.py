@@ -4,6 +4,7 @@ from sqlalchemy import String, DateTime, Boolean, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
+from .profile import Profile
 from .post import Post
 from .comment import Comment
 from .lists import List, user_saved_lists
@@ -22,6 +23,7 @@ class User(Base):
         _ 'email' is verified via Pydantic Schemas
 
     Relations:
+    _ 1:1 (One to One) with 'Profile' -> User.profile / Profile.user
     _ 1:N (One to Many) with 'Post' -> User.posts / Post.author
     _ 1:N (One to Many) with 'Comment' -> User.comment / Comment.commenter
     _ 1:N with 'List' (owned-lists) -> User.owned_lists / List.owner
@@ -69,4 +71,8 @@ class User(Base):
         "List",
         secondary=user_saved_lists,
         back_populates="users_who_saved_this_list"
+    )
+    # 1:1 with Profile
+    profile: Mapped[Profile] = relationship(
+        "Profile", backref="user", uselist=False
     )
