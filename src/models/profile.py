@@ -14,7 +14,7 @@ class Link(Base):
     """
     Table/Model: Link (links)
     Fields:
-        id (PK), title, url, profile_id (FK) (actually profile_user_id)
+        ID (PK), title, url, profile_id (FK) (actually profile_user_id)
     Notes:
         _ 'url' is verified via Pydantic Schemas
     Relations:
@@ -23,7 +23,7 @@ class Link(Base):
 
     __tablename__ = "links"
 
-    # id (defined in Base)
+    # ID (defined in Base)
     title: Mapped[str] = mapped_column(String(length=64), nullable=False)
     url: Mapped[str] = mapped_column(String, nullable=False)
 
@@ -57,7 +57,7 @@ class Profile(Base, UpdateAtFieldMixin):
         birth_date, gender, updated_at, profile_photo
 
     Points/Notes:
-        _ there is no 'id' field in this model. instead the 'user_id' field
+        _ there is no 'ID' field in this model. instead the 'user_id' field
           (FK from User model) is PK for this model (automatically indexed,
           unique and one2one -> result: less indexed columns - lighter db)
 
@@ -68,13 +68,13 @@ class Profile(Base, UpdateAtFieldMixin):
 
     __tablename__ = "profiles"
 
-    id = None  # to make 'user_id' as PK
+    ID = None  # to make 'user_id' as PK
 
     # 1:1 with User (backref: user)
     user_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(
-            "users.id",
+            "users.ID",
             name="user_profile_one2one",
             ondelete="CASCADE"
         ),

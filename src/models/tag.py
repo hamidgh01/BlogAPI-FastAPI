@@ -12,12 +12,12 @@ posts_tags = Table(
     Base.metadata,
     Column(
         "post_id",
-        ForeignKey("posts.id", ondelete="CASCADE"),
+        ForeignKey("posts.ID", ondelete="CASCADE"),
         nullable=False
     ),
     Column(
         "tag_id",
-        ForeignKey("tags.id", ondelete="CASCADE"),
+        ForeignKey("tags.ID", ondelete="CASCADE"),
         nullable=False
     ),
     PrimaryKeyConstraint(
@@ -31,7 +31,7 @@ class Tag(Base, CreatedAtFieldMixin):
     """
     Table/Model: Tag (tags)
     Fields:
-        id (PK), name, created_at
+        ID (PK), name, created_at
     Relations:
         _ N:N (Many to Many) with 'Post' -> Post.tags / Tag.posts
           (via posts_tags association table)
@@ -39,7 +39,6 @@ class Tag(Base, CreatedAtFieldMixin):
 
     __tablename__ = "tags"
 
-    # id (defined in Base)
     name: Mapped[str] = mapped_column(
         String(120), nullable=False, unique=True, index=True
     )

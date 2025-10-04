@@ -17,14 +17,13 @@ class Ticket(Base, CreatedAtFieldMixin):
     """
     Table/Model: Ticket (tickets)
     Fields:
-        id (PK), user_id (FK) [sender], subject, message, created_at, status
+        ID (PK), user_id (FK) [sender], subject, message, created_at, status
     Relations:
         _ N:1 (Many to One) with 'User' -> Ticket.sender / User.tickets
     """
 
     __tablename__ = "tickets"
 
-    # id (defined in Base)
     subject: Mapped[str] = mapped_column(String(length=120), nullable=True)
     message: Mapped[str] = mapped_column(String(length=4000), nullable=False)
     status: Mapped[TicketStatus] = mapped_column(
@@ -36,7 +35,7 @@ class Ticket(Base, CreatedAtFieldMixin):
     user_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(
-            "users.id",
+            "users.ID",
             name="fk_users_tickets",
             ondelete="SET NULL"
         ),

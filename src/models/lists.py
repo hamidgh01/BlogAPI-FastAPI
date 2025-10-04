@@ -14,13 +14,13 @@ saved_posts = Table(
     Base.metadata,
     Column(
         "list_id",
-        ForeignKey("lists.id", ondelete="CASCADE"),
+        ForeignKey("lists.ID", ondelete="CASCADE"),
         nullable=False,
         primary_key=True
     ),
     Column(
         "post_id",
-        ForeignKey("posts.id", ondelete="CASCADE"),
+        ForeignKey("posts.ID", ondelete="CASCADE"),
         nullable=False,
         primary_key=True
     ),
@@ -40,13 +40,13 @@ user_saved_lists = Table(
     Base.metadata,
     Column(
         "list_id",
-        ForeignKey("lists.id", ondelete="CASCADE"),
+        ForeignKey("lists.ID", ondelete="CASCADE"),
         nullable=False,
         primary_key=True
     ),
     Column(
         "user_id",
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey("users.ID", ondelete="CASCADE"),
         nullable=False,
         primary_key=True
     ),
@@ -62,7 +62,7 @@ class List(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     """
     Table/Model: List (lists)
     Fields:
-        id (PK), title, description, is_private,
+        ID (PK), title, description, is_private,
         created_at, updated_at, user_id (FK) [owner]
 
     Relations:
@@ -76,7 +76,6 @@ class List(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
 
     __tablename__ = "lists"
 
-    # id (defined in Base)
     title: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str] = mapped_column(
         String(length=1000), nullable=True
@@ -87,7 +86,7 @@ class List(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     user_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(
-            "users.id",
+            "users.ID",
             name="fk_users_owned_lists",
             ondelete="CASCADE"
         ),

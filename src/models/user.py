@@ -17,7 +17,7 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     """
     Table/Model: User (users)
     Fields:
-        id (PK), username, password, email,
+        ID (PK), username, password, email,
         is_active, is_superuser, date_joined, updated_at
 
     Points/Notes:
@@ -46,7 +46,7 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
 
     __tablename__ = "users"
 
-    # id (defined in Base)
+    # ID (defined in Base)
     username: Mapped[str] = mapped_column(
         String(length=64),
         nullable=False,

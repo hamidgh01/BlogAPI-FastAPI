@@ -26,12 +26,12 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     """
     Table/Model: Post (posts)
     Fields:
-        id (PK), title, slug, content, reading_time, status,
+        ID (PK), title, slug, content, reading_time, status,
         created_at, published_at, updated_at, user_id (FK)
 
     Points/Notes:
         _ 'slug' is generated via 'title' [calculated_field]
-        _ post_details is fetched using 'id' (slug usage: making semantic url)
+        _ post_details is fetched using 'ID' (slug usage: making semantic url)
         _ 'reading_time' is generated via 'content' [calculated_field]
 
     Relations:
@@ -47,7 +47,7 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
 
     __tablename__ = "posts"
 
-    # id (defined in Base)
+    # ID (defined in Base)
     title: Mapped[str] = mapped_column(
         String(length=250),
         nullable=False,
@@ -66,7 +66,7 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     user_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(
-            "users.id",
+            "users.ID",
             name="fk_users_posts",
             ondelete="CASCADE"
         ),

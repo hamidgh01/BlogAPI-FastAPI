@@ -18,7 +18,7 @@ class _BaseReport:
     reporter_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(
-            "users.id",
+            "users.ID",
             name="fk_users_reports_for_reporter",
             ondelete="SET NULL"
         ),
@@ -41,7 +41,7 @@ class ReportOnUser(Base, _BaseReport, CreatedAtFieldMixin):
     Table/Model: ReportOnUser (reports_on_users)
 
     Fields:
-        id (PK), title, description, reporter_id (FK),
+        ID (PK), title, description, reporter_id (FK),
         created_at, reported_user_id (FK)
 
     Points/Notes:
@@ -70,7 +70,7 @@ class ReportOnUser(Base, _BaseReport, CreatedAtFieldMixin):
     reported_user_id: Mapped[int | None] = mapped_column(
         BigInteger,
         ForeignKey(
-            "users.id",
+            "users.ID",
             name="fk_users_reports_for_reported_users",
             ondelete="CASCADE"
         ),
@@ -94,7 +94,7 @@ class ReportOnPost(Base, _BaseReport, CreatedAtFieldMixin):
     Table/Model: ReportOnPost (reports_on_posts)
 
     Fields:
-        id (PK), title, description, reporter_id (FK),
+        ID (PK), title, description, reporter_id (FK),
         created_at, reported_post_id (FK)
 
     Relations:
@@ -118,7 +118,7 @@ class ReportOnPost(Base, _BaseReport, CreatedAtFieldMixin):
     reported_post_id: Mapped[int | None] = mapped_column(
         BigInteger,
         ForeignKey(
-            "posts.id",
+            "posts.ID",
             name="fk_posts_reports",
             ondelete="CASCADE"
         ),

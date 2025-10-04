@@ -17,7 +17,7 @@ class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     """
     Table/Model: Comment (comments)
     Fields:
-        id (PK), content, created_at, updated_at, status,
+        ID (PK), content, created_at, updated_at, status,
         post_id (FK), user_id (FK), comment_parent_id (Self-Referenced)
 
     Points/Notes:
@@ -35,7 +35,6 @@ class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
 
     __tablename__ = "comments"
 
-    # id (defined in Base)
     content: Mapped[str] = mapped_column(
         String(length=1000), nullable=False
     )
@@ -48,7 +47,7 @@ class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     user_id: Mapped[int] = mapped_column(
         BigInteger,
         ForeignKey(
-            "users.id",
+            "users.ID",
             name="fk_users_comments",
             ondelete="CASCADE"
         ),
@@ -58,7 +57,7 @@ class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     post_parent_id: Mapped[int | None] = mapped_column(
         BigInteger,
         ForeignKey(
-            "posts.id",
+            "posts.ID",
             name="fk_posts_comments",
             ondelete="CASCADE"
         ),
@@ -69,7 +68,7 @@ class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     comment_parent_id: Mapped[int | None] = mapped_column(
         BigInteger,
         ForeignKey(
-            "comments.id",
+            "comments.ID",
             name="fk_comments_reply_comments",
             ondelete="CASCADE"
         ),
@@ -78,5 +77,5 @@ class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     )
     # Self-referencing relationship
     parent: Mapped["Comment"] = relationship(
-        "Comment", remote_side="id", backref="replies"
+        "Comment", remote_side="ID", backref="replies"
     )
