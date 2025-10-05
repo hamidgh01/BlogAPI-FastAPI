@@ -1,3 +1,5 @@
+from __future__ import annotations
+from typing import Self
 from datetime import datetime
 
 from sqlalchemy import String, Boolean
@@ -5,12 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
-from .profile import Profile
-from .post import Post
-from .comment import Comment
-from .lists import List, user_saved_lists
-from .ticket import Ticket
-from .report import ReportOnUser, ReportOnPost
+from .lists import user_saved_lists
 from .interactions import follows
 
 
@@ -65,48 +62,48 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     created_at = None
 
     # 1:N with Post
-    posts: Mapped[Post] = relationship(
+    posts: Mapped[list["Post"]] = relationship(
         "Post", backref="author"
     )
     # 1:N with Comment
-    comments: Mapped[Comment] = relationship(
+    comments: Mapped[list["Comment"]] = relationship(
         "Comment", backref="commenter"
     )
     # 1:N with List (owned-lists)
-    owned_lists: Mapped[List] = relationship(
+    owned_lists: Mapped[list["List"]] = relationship(
         "List", backref="owner"
     )
-    # N:N with List
-    saved_lists = relationship(
+    # N:N with List ('user_saved_lists' association table)
+    saved_lists: Mapped[list["List"]] = relationship(
         "List",
         secondary=user_saved_lists,
         back_populates="users_who_saved_this_list"
     )
     # 1:1 with Profile
-    profile: Mapped[Profile] = relationship(
+    profile: Mapped["Profile"] = relationship(
         "Profile", backref="user", uselist=False
     )
     # 1:N with Ticket
-    tickets: Mapped[Ticket] = relationship(
+    tickets: Mapped[list["Ticket"]] = relationship(
         "Ticket", backref="sender"
     )
     # ------------------------------------------------------
     # 1:N with ReportOnUser (as reporter)
-    reports_on_users: Mapped[ReportOnUser] = relationship(
+    reports_on_users: Mapped[list["ReportOnUser"]] = relationship(
         "ReportOnUser", backref="reporter"
     )
     # 1:N with ReportOnUser (as reported_user)
-    received_reports: Mapped[ReportOnUser] = relationship(
+    received_reports: Mapped[list["ReportOnUser"]] = relationship(
         "ReportOnUser", backref="reported_user"
     )
     # ---------------------------------------
     # 1:N with ReportOnPost (as reporter)
-    reports_on_posts: Mapped[ReportOnPost] = relationship(
+    reports_on_posts: Mapped[list["ReportOnPost"]] = relationship(
         "ReportOnPost", backref="reporter"
     )
     # ------------------------------------------------------
-    # N:N with User (itself) (Follower:Following)
-    followings = relationship(
+    # N:N with User itself (Follower:Following) ('follows' association table)
+    followings: Mapped[list[Self]] = relationship(
         "User",
         secondary=follows,
         primaryjoin=lambda: User.ID == follows.c.follower_id,

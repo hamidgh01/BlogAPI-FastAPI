@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import String, ForeignKey, Table, Column, PrimaryKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -43,8 +45,8 @@ class Tag(Base, CreatedAtFieldMixin):
         String(120), nullable=False, unique=True, index=True
     )
 
-    # N:N with Post
-    posts = relationship(
+    # N:N with Post ('posts_tags' association table)
+    posts: Mapped[list["Post"]] = relationship(
         "Post",
         secondary=posts_tags,
         back_populates="tags"

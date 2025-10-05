@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from enum import Enum as PythonEnum
 from datetime import datetime
 
@@ -10,10 +12,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 from .tag import posts_tags
-from .comment import Comment
 from .lists import saved_posts
-from .report import ReportOnPost
-
 
 class PostStatus(PythonEnum):
     DR = "draft"
@@ -76,22 +75,24 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     # NOTE: because of using 'backref="author"' in referenced table 'User',
     # you don't need to define 'relationship(...)' here.
 
-    # N:N with Tag
-    tags = relationship(
+    # N:N with Tag ('posts_tags' association table)
+    tags: Mapped[list["Tag"]] = relationship(
         "Tag",
         secondary=posts_tags,
         back_populates="posts"
     )
     # 1:N with Comment
-    comments: Mapped[Comment] = relationship("Comment", backref="post")
-    # N:N with List
-    lists = relationship(
+    comments: Mapped[list["Comment"]] = relationship(
+        "Comment", backref="post"
+    )
+    # N:N with List ('saved_posts' association table)
+    lists: Mapped[list["List"]] = relationship(
         "List",
         secondary=saved_posts,
         back_populates="posts"
     )
     # 1:N with ReportOnPost
-    received_reports: Mapped[ReportOnPost] = relationship(
+    received_reports: Mapped[list["ReportOnPost"]] = relationship(
         "ReportOnPost", backref="reported_post"
     )
 

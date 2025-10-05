@@ -1,3 +1,4 @@
+from typing import Self
 from enum import Enum as PythonEnum
 
 from sqlalchemy import BigInteger, String, ForeignKey, Enum as SqlEnum
@@ -76,6 +77,9 @@ class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         index=True
     )
     # Self-referencing relationship
-    parent: Mapped["Comment"] = relationship(
+    parent: Mapped[Self] = relationship(
         "Comment", remote_side="ID", backref="replies"
     )
+    # NOTE:
+    # Comment.parent -> Self (if parent is a Comment)
+    # Comment.replies -> list[Self]

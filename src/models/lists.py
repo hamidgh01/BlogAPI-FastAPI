@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from sqlalchemy import (
     BigInteger, String, Boolean, DateTime, func, ForeignKey, Table, Column
 )
@@ -94,14 +96,14 @@ class List(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         index=True
     )
 
-    # N:N with Post
-    posts = relationship(
+    # N:N with Post ('saved_posts' association table)
+    posts: Mapped[list["Post"]] = relationship(
         "Post",
         secondary=saved_posts,
         back_populates="lists"
     )
-    # N:N with User
-    users_who_saved_this_list = relationship(
+    # N:N with User ('user_saved_lists' association table)
+    users_who_saved_this_list: Mapped[list["User"]] = relationship(
         "User",
         secondary=user_saved_lists,
         back_populates="saved_lists"

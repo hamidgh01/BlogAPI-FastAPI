@@ -97,7 +97,7 @@ class Profile(Base, UpdateAtFieldMixin):
     # profile_photo: Mapped[...]  # ToDo: implement this later
 
     # 1:N with Link
-    links: Mapped[Link] = relationship(
+    links: Mapped[list[Link]] = relationship(
         "Link", backref="related_profile"
     )
 
