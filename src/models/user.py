@@ -8,7 +8,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
 from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 from .lists import user_saved_lists
-from .interactions import follows
+from .interactions import follows, post_likes
 
 
 class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
@@ -16,7 +16,7 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     Table/Model: User (users)
     Fields:
         ID (PK), username, password, email,
-        is_active, is_superuser, date_joined, updated_at
+        is_active, is_superuser, created_at, updated_at
 
     Points/Notes:
         _ 'password' isn't stored in plain text. its hashed-value
@@ -42,6 +42,8 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
           -> User.reports_on_posts / ReportOnPost.reporter
     _ N:N (Many to Many) with 'User' (itself) (follow-system)
       -> User.followings / User.followers (via 'follows' association table)
+    _ N:N (Many to Many) with 'Post' (like-system)
+      -> User.liked_posts / Post.likers (via 'post_likes' association table)
     """
 
     __tablename__ = "users"
@@ -58,8 +60,8 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    date_joined: Mapped[datetime] = CreatedAtFieldMixin.created_at  # alias
-    created_at = None
+    # date_joined: Mapped[datetime] = CreatedAtFieldMixin.created_at  # alias
+    # created_at = None
 
     # 1:N with Post
     posts: Mapped[list["Post"]] = relationship(
@@ -109,4 +111,10 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         primaryjoin=lambda: User.ID == follows.c.follower_id,
         secondaryjoin=lambda: User.ID == follows.c.following_id,
         backref="followers"
+    )
+    # N:N with Post (like-system) ('post_likes' association table)
+    liked_posts: Mapped[list["Post"]] = relationship(
+        "Post",
+        secondary=post_likes,
+        back_populates="likers"
     )

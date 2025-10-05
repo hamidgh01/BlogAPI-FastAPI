@@ -29,3 +29,30 @@ follows = Table(
     )
 )
 # NOTE: 'primary_key=True' in both columns --> makes a composite_key of them
+
+
+# 'post_likes' association table -> M2M between 'users' and 'posts'.
+# NOTE: PK here is the combination of "post_id" and "user_id".
+post_likes = Table(
+    "post_likes",
+    Base.metadata,
+    Column(
+        "post_id",
+        BigInteger,
+        ForeignKey("posts.ID", ondelete="CASCADE"),
+        nullable=False,
+        primary_key=True
+    ),
+    Column(
+        "user_id",
+        BigInteger,
+        ForeignKey("users.ID", ondelete="CASCADE"),
+        nullable=False,
+        primary_key=True
+    ),
+    Column(
+        name="liked_at",
+        type_=DateTime,
+        server_default=func.now()
+    )
+)

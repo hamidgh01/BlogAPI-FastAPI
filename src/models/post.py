@@ -13,6 +13,8 @@ from .base import Base
 from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 from .tag import posts_tags
 from .lists import saved_posts
+from .interactions import post_likes
+
 
 class PostStatus(PythonEnum):
     DR = "draft"
@@ -42,6 +44,8 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
       (via 'saved_posts' association table)
     _ 1:N (One to Many) with 'ReportOnPost'
       ->  Post.received_reports / ReportOnPost.reported_post
+    _ N:N (Many to Many) with 'User' (like-system)
+      -> Post.likers / User.liked_posts (via 'post_likes' association table)
     """
 
     __tablename__ = "posts"
@@ -90,6 +94,12 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         "List",
         secondary=saved_posts,
         back_populates="posts"
+    )
+    # N:N with User (like-system) ('post_likes' association table)
+    likers: Mapped[list["User"]] = relationship(
+        "User",
+        secondary=post_likes,
+        back_populates="liked_posts"
     )
     # 1:N with ReportOnPost
     received_reports: Mapped[list["ReportOnPost"]] = relationship(
