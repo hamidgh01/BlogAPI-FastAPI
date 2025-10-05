@@ -1,10 +1,15 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 
 from sqlalchemy import String, ForeignKey, Table, Column, PrimaryKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
 from ._mixins import CreatedAtFieldMixin
+
+if TYPE_CHECKING:
+    from . import Post
+
 
 # 'posts_tags' association table to implement ManyToMany relationship
 # between 'Posts' and 'Tags'.
@@ -46,7 +51,7 @@ class Tag(Base, CreatedAtFieldMixin):
     )
 
     # N:N with Post ('posts_tags' association table)
-    posts: Mapped[list["Post"]] = relationship(
+    posts: Mapped[list[Post]] = relationship(
         "Post",
         secondary=posts_tags,
         back_populates="tags"

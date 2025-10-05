@@ -1,6 +1,5 @@
 from __future__ import annotations
-from typing import Self
-from datetime import datetime
+from typing import Self, TYPE_CHECKING
 
 from sqlalchemy import String, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -9,6 +8,17 @@ from .base import Base
 from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 from .lists import user_saved_lists
 from .interactions import follows, post_likes
+
+if TYPE_CHECKING:
+    from . import (
+        Profile,
+        Post,
+        Comment,
+        List,
+        Ticket,
+        ReportOnUser,
+        ReportOnPost
+    )
 
 
 class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
@@ -64,43 +74,43 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     # created_at = None
 
     # 1:N with Post
-    posts: Mapped[list["Post"]] = relationship(
+    posts: Mapped[list[Post]] = relationship(
         "Post", backref="author"
     )
     # 1:N with Comment
-    comments: Mapped[list["Comment"]] = relationship(
+    comments: Mapped[list[Comment]] = relationship(
         "Comment", backref="commenter"
     )
     # 1:N with List (owned-lists)
-    owned_lists: Mapped[list["List"]] = relationship(
+    owned_lists: Mapped[list[List]] = relationship(
         "List", backref="owner"
     )
     # N:N with List ('user_saved_lists' association table)
-    saved_lists: Mapped[list["List"]] = relationship(
+    saved_lists: Mapped[list[List]] = relationship(
         "List",
         secondary=user_saved_lists,
         back_populates="users_who_saved_this_list"
     )
     # 1:1 with Profile
-    profile: Mapped["Profile"] = relationship(
+    profile: Mapped[Profile] = relationship(
         "Profile", backref="user", uselist=False
     )
     # 1:N with Ticket
-    tickets: Mapped[list["Ticket"]] = relationship(
+    tickets: Mapped[list[Ticket]] = relationship(
         "Ticket", backref="sender"
     )
     # ------------------------------------------------------
     # 1:N with ReportOnUser (as reporter)
-    reports_on_users: Mapped[list["ReportOnUser"]] = relationship(
+    reports_on_users: Mapped[list[ReportOnUser]] = relationship(
         "ReportOnUser", backref="reporter"
     )
     # 1:N with ReportOnUser (as reported_user)
-    received_reports: Mapped[list["ReportOnUser"]] = relationship(
+    received_reports: Mapped[list[ReportOnUser]] = relationship(
         "ReportOnUser", backref="reported_user"
     )
     # ---------------------------------------
     # 1:N with ReportOnPost (as reporter)
-    reports_on_posts: Mapped[list["ReportOnPost"]] = relationship(
+    reports_on_posts: Mapped[list[ReportOnPost]] = relationship(
         "ReportOnPost", backref="reporter"
     )
     # ------------------------------------------------------
@@ -113,7 +123,7 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         backref="followers"
     )
     # N:N with Post (like-system) ('post_likes' association table)
-    liked_posts: Mapped[list["Post"]] = relationship(
+    liked_posts: Mapped[list[Post]] = relationship(
         "Post",
         secondary=post_likes,
         back_populates="likers"

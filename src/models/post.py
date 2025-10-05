@@ -1,4 +1,5 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
 
 from enum import Enum as PythonEnum
 from datetime import datetime
@@ -14,6 +15,9 @@ from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 from .tag import posts_tags
 from .lists import saved_posts
 from .interactions import post_likes
+
+if TYPE_CHECKING:
+    from . import User, Tag, Comment, List, ReportOnPost
 
 
 class PostStatus(PythonEnum):
@@ -80,29 +84,29 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     # you don't need to define 'relationship(...)' here.
 
     # N:N with Tag ('posts_tags' association table)
-    tags: Mapped[list["Tag"]] = relationship(
+    tags: Mapped[list[Tag]] = relationship(
         "Tag",
         secondary=posts_tags,
         back_populates="posts"
     )
     # 1:N with Comment
-    comments: Mapped[list["Comment"]] = relationship(
+    comments: Mapped[list[Comment]] = relationship(
         "Comment", backref="post"
     )
     # N:N with List ('saved_posts' association table)
-    lists: Mapped[list["List"]] = relationship(
+    lists: Mapped[list[List]] = relationship(
         "List",
         secondary=saved_posts,
         back_populates="posts"
     )
     # N:N with User (like-system) ('post_likes' association table)
-    likers: Mapped[list["User"]] = relationship(
+    likers: Mapped[list[User]] = relationship(
         "User",
         secondary=post_likes,
         back_populates="liked_posts"
     )
     # 1:N with ReportOnPost
-    received_reports: Mapped[list["ReportOnPost"]] = relationship(
+    received_reports: Mapped[list[ReportOnPost]] = relationship(
         "ReportOnPost", backref="reported_post"
     )
 
