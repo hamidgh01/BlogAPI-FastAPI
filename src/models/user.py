@@ -11,6 +11,7 @@ from .comment import Comment
 from .lists import List, user_saved_lists
 from .ticket import Ticket
 from .report import ReportOnUser, ReportOnPost
+from .interactions import follows
 
 
 class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
@@ -42,6 +43,8 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     relation with 'ReportOnPost':
         _ 1:N (One to Many) with 'ReportOnPost' (as reporter)
           -> User.reports_on_posts / ReportOnPost.reporter
+    _ N:N (Many to Many) with 'User' (itself) (follow-system)
+      -> User.followings / User.followers (via 'follows' association table)
     """
 
     __tablename__ = "users"
@@ -102,3 +105,11 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         "ReportOnPost", backref="reporter"
     )
     # ------------------------------------------------------
+    # N:N with User (itself) (Follower:Following)
+    followings = relationship(
+        "User",
+        secondary=follows,
+        primaryjoin=lambda: User.ID == follows.c.follower_id,
+        secondaryjoin=lambda: User.ID == follows.c.following_id,
+        backref="followers"
+    )

@@ -9,6 +9,7 @@ from .comment import Comment
 from .lists import List, saved_posts, user_saved_lists
 from .ticket import Ticket
 from .report import ReportOnUser, ReportOnPost
+from .interactions import follows
 
 __all__ = [
     "Base",
@@ -23,5 +24,6 @@ __all__ = [
     "user_saved_lists",
     "Ticket",
     "ReportOnUser",
-    "ReportOnPost"
+    "ReportOnPost",
+    "follows",
 ]
