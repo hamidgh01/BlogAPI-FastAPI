@@ -1,12 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
-
 from enum import Enum as PythonEnum
 from datetime import datetime
 
 from sqlalchemy import (
     String, Text, SmallInteger, BigInteger, DateTime,
-    ForeignKey, Enum as SqlEnum
+    Boolean, ForeignKey, Enum as SqlEnum
 )
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -31,7 +30,7 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     """
     Table/Model: Post (posts)
     Fields:
-        ID (PK), title, slug, content, reading_time, status,
+        ID (PK), title, slug, content, reading_time, status, is_private
         created_at, published_at, updated_at, user_id (FK)
 
     Points/Notes:
@@ -67,6 +66,7 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         SqlEnum(PostStatus, name="post_status_enum"),
         default=PostStatus.DR, nullable=False
     )
+    is_private: Mapped[bool] = mapped_column(Boolean, default=False)
     published_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)  # ToDo: I'll possibly index this column
 
     # N:1 with User (backref: author)
