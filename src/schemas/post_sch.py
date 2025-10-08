@@ -22,10 +22,13 @@ class CreateTagSchema(BaseModel):
     @field_validator("name")
     @classmethod
     def check_name(cls, value):
-        if value and fullmatch(r"[ا-یa-zA-Z0-9_]{1,120}", value):
-            raise ValueError("[name] allowed characters: "
+        if value and not fullmatch(r"[ا-یa-zA-Z0-9_]{1,120}", value):
+            raise ValueError("[name] length <= 120  |  allowed characters: "
                              "Persian/English Alphabets , numbers , _ ")
         return value
+    # NOTE:
+    # because of 'mode="after"' in above field_validator, and 'max_length=120'
+    # in 'name' field --> 'length <= 120' is validated by Pydantic itself
 
 
 class ReadTagSchema(BaseModel):  # for both 'tag_list' and 'tag_details'
