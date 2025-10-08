@@ -126,6 +126,16 @@ def test_healthiness_of_update_post_status_schema():
     up_st_sch3 = UpdatePostStatusSchema(status="rejected")
     up_st_sch4 = UpdatePostStatusSchema(status="deleted-by-author")
     assert up_st_sch1.status.value == "draft"
+    assert up_st_sch1.status.name == "DR"
     assert up_st_sch2.status.value == "published"
+    assert up_st_sch2.status.name == "PB"
     assert up_st_sch3.status.value == "rejected"
+    assert up_st_sch3.status.name == "RJ"
     assert up_st_sch4.status.value == "deleted-by-author"
+    assert up_st_sch4.status.name == "DL"
+
+    with pytest.raises(ValidationError) as err:
+        UpdatePostStatusSchema(status="shit...")
+
+    msg = "Input should be 'draft', 'published', 'rejected' or 'deleted-by-au"
+    assert msg in err.value.__str__()
