@@ -8,8 +8,8 @@ from ._mixins import CreatedAtFieldMixin
 
 
 class TicketStatus(PythonEnum):
-    N = "hasn't been read"
-    R = "has been read"
+    N = "unread"  # "hasn't been read"
+    R = "read"  # "has been read"
     C = "closed"
 
 

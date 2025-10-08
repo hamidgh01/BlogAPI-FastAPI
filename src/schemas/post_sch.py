@@ -3,9 +3,7 @@
 from typing import Annotated, List, Optional
 from re import fullmatch
 
-from pydantic import (
-    BaseModel, Field, field_validator, ConfigDict
-)
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 from src.models import PostStatus
 
@@ -56,7 +54,7 @@ class CreatePostSchema(BaseModel):
     status: Annotated[PostStatus, Field(
         default=PostStatus.DR,
         description="Post status enum "
-                    "(PostStatus.DR -> 'Draft' / PostStatus.PB -> 'Published')"
+                    "draft/published/rejected/deleted-by-author"
     )]
     # NOTE:
     # if status=DR -> published_at=null
@@ -91,7 +89,11 @@ class ChangePostPrivacySchema(BaseModel):
 
 
 class UpdatePostStatusSchema(BaseModel):
-    status: Annotated[PostStatus, Field(..., description="...")]
+    status: Annotated[PostStatus, Field(
+        ...,
+        description="Post status enum: "
+                    "draft/published/rejected/deleted-by-author"
+    )]
     # NOTE:
     # this schema is used for: when:
     # _ user publishes a draft-post -> status=PostStatus.PB ("Published")
