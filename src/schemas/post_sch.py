@@ -86,7 +86,7 @@ class UpdatePostSchema(BaseModel):
     )]
 
 
-class ChangePostPrivacy(BaseModel):
+class ChangePostPrivacySchema(BaseModel):
     is_private: Annotated[bool, Field(..., description="being Private/Public")]
 
 

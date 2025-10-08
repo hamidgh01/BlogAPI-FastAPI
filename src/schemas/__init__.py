@@ -10,7 +10,7 @@ from .post_sch import (
     ReadTagSchema,
     CreatePostSchema,
     UpdatePostSchema,
-    ChangePostPrivacy,
+    ChangePostPrivacySchema,
     UpdatePostStatusSchema
 )
 
@@ -27,6 +27,6 @@ __all__ = [
     "ReadTagSchema",
     "CreatePostSchema",
     "UpdatePostSchema",
-    "ChangePostPrivacy",
+    "ChangePostPrivacySchema",
     "UpdatePostStatusSchema"
 ]

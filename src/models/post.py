@@ -22,8 +22,8 @@ if TYPE_CHECKING:
 class PostStatus(PythonEnum):
     DR = "draft"
     PB = "published"
-    RJ = "Rejected"
-    DL = "Deleted-By-Author"
+    RJ = "rejected"
+    DL = "deleted-by-author"
 
 
 class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):

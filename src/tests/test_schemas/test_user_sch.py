@@ -29,7 +29,10 @@ def test_invalid_username_patterns(invalid_username, expected):
     assert expected in err.value.__str__()
 
 
-def test_create_and_update_user_schemas_behaviour_with_invalid_email():
+@pytest.mark.parametrize(
+    "schema", [CreateUserSchema, UpdateUserForAdminSchema, UpdateUserSchema]
+)
+def test_create_and_update_user_schemas_behaviour_with_invalid_email(schema):
     """ IMPORTANT NOTE:
     this `test` doesn't test various invalid email formats, because
     it is covered by Pydantic internally (via EmailStr).
@@ -42,17 +45,8 @@ def test_create_and_update_user_schemas_behaviour_with_invalid_email():
         "password": "test_password",
         "confirm_password": "test_password"
     }
-
     with pytest.raises(ValueError) as err:
-        CreateUserSchema(**fields)
-    assert "value is not a valid email address" in err.value.__str__()
-
-    with pytest.raises(ValueError) as err:
-        UpdateUserForAdminSchema(**fields)
-    assert "value is not a valid email address" in err.value.__str__()
-
-    with pytest.raises(ValueError) as err:
-        UpdateUserSchema(**fields)
+        schema(**fields)
     assert "value is not a valid email address" in err.value.__str__()
 
 
