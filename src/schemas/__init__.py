@@ -19,6 +19,13 @@ from .ticket_sch import (
     TicketListSchema,
     TicketDetailsSchema
 )
+from .comment_sch import (
+    CreateCommentSchema,
+    UpdateCommentContentSchema,
+    UpdateCommentStatusSchema,
+    CommentListSchema,
+    CommentDetailsSchema
+)
 
 
 __all__ = [
@@ -40,5 +47,10 @@ __all__ = [
     "UpdateTicketStatusForAdminSchema",
     "TicketListSchema",
     "TicketDetailsSchema",
-
+    # Comment Schemas
+    "CreateCommentSchema",
+    "UpdateCommentContentSchema",
+    "UpdateCommentStatusSchema",
+    "CommentListSchema",
+    "CommentDetailsSchema",
 ]

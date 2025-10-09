@@ -10,7 +10,7 @@ from ._mixins import CreatedAtFieldMixin, UpdateAtFieldMixin
 
 class CommentStatus(PythonEnum):
     PB = "published"
-    HD = "Hidden by Admin"
+    HD = "Hidden-by-Admin"
     DL = "Deleted-By-Commenter"
 
 
