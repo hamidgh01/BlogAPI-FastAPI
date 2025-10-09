@@ -74,5 +74,3 @@ class CommentDetailsSchema(CommentListSchema):
     updated_at: Annotated[datetime, Field(
         ..., description="Last update timestamp"
     )]
-
-    model_config = ConfigDict(from_attributes=True)

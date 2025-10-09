@@ -53,8 +53,6 @@ class ListDetailsSchema(ListListSchema):
         None, max_length=1000, description="List description"
     )]
 
-    model_config = ConfigDict(from_attributes=True)
-
 
 # DeleteList...
 

@@ -34,6 +34,14 @@ from .list_sch import (
     SaveOrUnsavePost,
     SaveOrUnsaveList
 )
+from .reports_sch import (
+    CreateReportOnUserSchema,
+    ReportOnUserListSchema,
+    ReportOnUserDetailsSchema,
+    CreateReportOnPostSchema,
+    ReportOnPostListSchema,
+    ReportOnPostDetailsSchema
+)
 
 
 __all__ = [
@@ -68,4 +76,11 @@ __all__ = [
     "ListDetailsSchema",
     "SaveOrUnsavePost",
     "SaveOrUnsaveList",
+    # Reports (on users and posts) Schemas
+    "CreateReportOnUserSchema",
+    "ReportOnUserListSchema",
+    "ReportOnUserDetailsSchema",
+    "CreateReportOnPostSchema",
+    "ReportOnPostListSchema",
+    "ReportOnPostDetailsSchema"
 ]
