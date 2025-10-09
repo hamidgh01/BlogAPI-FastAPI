@@ -88,6 +88,14 @@ class List(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     )
     is_private: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    # ToDo: add a post_count column -> avoid querying database to count number
+    #  of Posts in each List for 'saved-lists' or 'owned-lists' routes
+
+    # ToDo: probably delete 'updated_at' field / or maybe don't delete
+    # NOTE (important) : the 'last-update' value for a list
+    # will be the last time a post added to that list:
+    # -> MAX(saved_date) for saved_posts in a list
+
     # N:1 with User (backref: owner)
     user_id: Mapped[int] = mapped_column(
         BigInteger,
