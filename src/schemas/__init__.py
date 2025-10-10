@@ -42,6 +42,11 @@ from .reports_sch import (
     ReportOnPostListSchema,
     ReportOnPostDetailsSchema
 )
+from .profile_sch import (
+    CreateLinkSchema,
+    UpdateLinkSchema,
+    LinkListSchema,
+)
 
 
 __all__ = [
@@ -82,5 +87,9 @@ __all__ = [
     "ReportOnUserDetailsSchema",
     "CreateReportOnPostSchema",
     "ReportOnPostListSchema",
-    "ReportOnPostDetailsSchema"
+    "ReportOnPostDetailsSchema",
+    # Profile & Link Schemas
+    "CreateLinkSchema",
+    "UpdateLinkSchema",
+    "LinkListSchema",
 ]

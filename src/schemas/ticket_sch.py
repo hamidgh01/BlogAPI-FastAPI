@@ -5,7 +5,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from src.models.ticket import TicketStatus
+from src.models import TicketStatus
 
 
 class CreateTicketSchema(BaseModel):

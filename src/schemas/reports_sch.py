@@ -5,7 +5,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from src.models.report import UserReportTitleChoices, PostReportTitleChoices
+from src.models import UserReportTitleChoices, PostReportTitleChoices
 
 # ----------------------------------------------------------
 # ReportOnUser Schemas
