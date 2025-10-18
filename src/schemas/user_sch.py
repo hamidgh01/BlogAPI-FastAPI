@@ -100,7 +100,7 @@ class SetNewPassword(_SetPasswordOperationSchema):
     pass  # it's used for password reset by email
 
 
-class UserLoginSchema:  # _BaseUserSchemaForWrite or BaseModel
+class UserLoginSchema(BaseModel):
     identifier: Annotated[str, Field(
         ..., description="can be 'username' or 'email' of the User"
     )]

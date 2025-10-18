@@ -6,6 +6,8 @@ from src.schemas import (
     UpdateUserForAdminSchema,
     UpdatePasswordSchema,
     # SetNewPassword,  Doesn't need to be tested
+    UserLoginSchema,
+    FollowOrUnfollowSchema
 )
 # NOTE: repeated functionalities and validation in different Schemas
 # is tested just for one time!
@@ -125,3 +127,21 @@ def test_healthiness_of_update_password_schema():
         old_password="12345678"
     )
     assert user_pass_schema.password == "abcde12345"
+
+
+def test_healthiness_of_user_login_schema():
+    """ test successful validation and serialization in UserLoginSchema() """
+
+    sch1 = UserLoginSchema(identifier="hamid01", password="7686453452")
+    sch2 = UserLoginSchema(identifier="hamid@example.com", password="test1234")
+    assert type(sch1.password) is str
+    assert sch1.identifier == "hamid01"
+    assert sch2.identifier == "hamid@example.com"
+
+
+def test_healthiness_of_follow_or_unfollow_schema():
+    """
+    test successful validation and serialization in FollowOrUnfollowSchema()
+    """
+    sch = FollowOrUnfollowSchema(intended_user_id=2345)
+    assert type(sch.intended_user_id) is int and sch.intended_user_id == 2345
