@@ -57,6 +57,9 @@ class ListDetailsSchema(ListListSchema):
 # DeleteList...
 
 
+# --------------------------------------------------------------------
+
+
 class SaveOrUnsavePost(BaseModel):
     post_id: Annotated[int, Field(..., description="ID of intended post")]
     # post_ids: Annotated[list[int], Field(
@@ -67,6 +70,6 @@ class SaveOrUnsavePost(BaseModel):
 
 class SaveOrUnsaveList(BaseModel):
     list_id: Annotated[int, Field(..., description="ID of intended list")]
-    # user_id: Annotated[int, Field(
-    #     ..., description="ID the user who wants to unsave the list"
-    # )]  # it'll be extracted form auth-token
+    # user_id: int
+    #   -> ID of the user who wants to save or unsave a list
+    #   -> it'll be extracted form auth-token

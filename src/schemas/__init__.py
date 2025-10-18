@@ -5,6 +5,7 @@ from .user_sch import (
     UpdatePasswordSchema,
     SetNewPassword,
     UserLoginSchema,
+    FollowOrUnfollowSchema,
 )
 from .post_sch import (
     CreateTagSchema,
@@ -60,6 +61,7 @@ __all__ = [
     "UpdatePasswordSchema",
     "SetNewPassword",
     "UserLoginSchema",
+    "FollowOrUnfollowSchema",
     # Post & Tag Schemas
     "CreateTagSchema",
     "ReadTagSchema",

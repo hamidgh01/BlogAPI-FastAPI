@@ -109,3 +109,15 @@ class UserLoginSchema:  # _BaseUserSchemaForWrite or BaseModel
 
 class UserDetailsSchema: pass
 class UserListSchema: pass
+
+
+# --------------------------------------------------------------------
+
+
+class FollowOrUnfollowSchema(BaseModel):
+    # user_id: int
+    #   -> ID of the user who wants to follow or unfollow another one
+    #   -> it'll be extracted form auth-token
+    intended_user_id: Annotated[int, Field(
+        ..., description="ID of the intended user to follow or unfollow"
+    )]
