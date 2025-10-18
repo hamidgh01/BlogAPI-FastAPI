@@ -110,4 +110,5 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         "ReportOnPost", backref="reported_post"
     )
 
+    # ToDo: add 'pin' column with limitation=10 (for example)
     # ToDo: if for a user: is_active=False --> his posts should be hidden too.

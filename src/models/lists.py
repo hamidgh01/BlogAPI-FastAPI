@@ -91,6 +91,8 @@ class List(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     # ToDo: add a post_count column -> avoid querying database to count number
     #  of Posts in each List for 'saved-lists' or 'owned-lists' routes
 
+    # ToDo: add 'pin' column with limitation=10 (for example)
+
     # ToDo: probably delete 'updated_at' field / or maybe don't delete
     # NOTE (important) : the 'last-update' value for a list
     # will be the last time a post added to that list:
