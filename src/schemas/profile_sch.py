@@ -94,7 +94,7 @@ class UpdateProfileSchema(_BaseProfileSchema):
 class ProfileListForClientSchema(BaseModel):
     """ NOTE: this schema includes field from both User and Profile models """
     user_id: Annotated[int, Field(..., description="PK of profile (User ID)")]
-    display_name: Optional[str]
+    display_name: Optional[str] = None
     user: Annotated[UserOutForClientSchema, Field(
         ..., description="Contains 'username' and 'id' of User model"
     )]
@@ -105,8 +105,8 @@ class ProfileListForClientSchema(BaseModel):
 
 class ProfileDetailsForClientSchema(ProfileListForClientSchema):
     """ NOTE: this schema includes field from both User and Profile models """
-    about: Optional[str]
-    birth_date: Optional[date]
+    about: Optional[str] = None
+    birth_date: Optional[date] = None
     gender: Gender
     links: Annotated[Optional[list[LinkListSchema]], Field(
         None, description="list of profile's links (if there is any)"
@@ -128,7 +128,7 @@ class ProfileDetailsForClientSchema(ProfileListForClientSchema):
 class ProfileListForAdminPanelSchema(BaseModel):
     """ NOTE: this schema includes field from both User and Profile models """
     user_id: Annotated[int, Field(..., description="PK of profile (User ID)")]
-    display_name: Optional[str]
+    display_name: Optional[str] = None
     created_at: Annotated[datetime, Field(
         ..., description="creation date and time (timestamp)"
     )]
@@ -143,9 +143,9 @@ class ProfileListForAdminPanelSchema(BaseModel):
 
 class ProfileDetailsForAdminPanelSchema(ProfileListForAdminPanelSchema):
     """ NOTE: this schema includes field from both User and Profile models """
-    about: Annotated[Optional[str], Field(None)]
-    updated_at: date  # Profile.updated_at
-    birth_date: Optional[date]
+    about: Optional[str] = None
+    updated_at: datetime  # Profile.updated_at
+    birth_date: Optional[date] = None
     links: Annotated[Optional[list[LinkListSchema]], Field(
         None, description="list of profile's links (if there is any)"
     )]
