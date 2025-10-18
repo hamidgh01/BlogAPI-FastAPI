@@ -3,9 +3,7 @@
 from typing import Annotated, Optional
 from re import fullmatch
 
-from pydantic import (
-    BaseModel, Field, EmailStr, field_validator
-)
+from pydantic import BaseModel, Field, EmailStr, field_validator
 
 # --------------------------------------------------------------------
 # Bases & Mixins:
@@ -23,7 +21,7 @@ class _SetPasswordOperationSchema(BaseModel):
 
     @field_validator("password", mode="before")
     @classmethod
-    def check_password_pattern(cls, value: str):  # NOTE: value=password
+    def check_password_pattern(cls, value: str) -> str:  # NOTE: value=password
         if not fullmatch(r"\S{8,64}", value):
             raise ValueError(
                 "[password] can not include whitespace characters (space,"
@@ -33,7 +31,7 @@ class _SetPasswordOperationSchema(BaseModel):
 
     @field_validator("confirm_password")
     @classmethod
-    def check_passwords_match(cls, value: str, info):
+    def check_passwords_match(cls, value: str, info) -> str:
         # NOTE: value=confirm_password
         if ("password" in info.data) and (value == info.data["password"]):
             return value
@@ -44,7 +42,7 @@ class _CheckUsernamePatternValidatorMixin:
 
     @field_validator("username", mode="before")
     @classmethod
-    def check_patterns(cls, value: str):
+    def check_patterns(cls, value: str) -> str:
         if value and not fullmatch(r"[a-z0-9_]{3,64}", value):
             raise ValueError(
                 "[username] allowed characters: 'a-z', '0-9', '_' "
@@ -102,7 +100,12 @@ class SetNewPassword(_SetPasswordOperationSchema):
     pass  # it's used for password reset by email
 
 
-# ToDo: complete these later
-class UserLoginSchema: pass
+class UserLoginSchema:  # _BaseUserSchemaForWrite or BaseModel
+    identifier: Annotated[str, Field(
+        ..., description="can be 'username' or 'email' of the User"
+    )]
+    password: Annotated[str, Field(..., description="password of the user")]
+
+
 class UserDetailsSchema: pass
 class UserListSchema: pass
