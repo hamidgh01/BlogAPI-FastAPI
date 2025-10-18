@@ -1,11 +1,16 @@
 """ Schemas (Pydantic models) for 'Profile' & 'Link' Models """
 
 from typing import Annotated, Optional
-from datetime import date
+from datetime import datetime, date
 
 from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 
 from src.models import Gender
+from .user_sch import (
+    UserOutForClientSchema,
+    UserListForAdminSchema,
+    UserDetailsForAdminSchema
+)
 
 # ----------------------------------------------------------
 # Link Schemas (part of Profile)
@@ -80,3 +85,81 @@ class InitialProfileSchema(_BaseProfileSchema):
 class UpdateProfileSchema(_BaseProfileSchema):
     # All fields optional for partial updates
     pass
+
+
+# ------------------------------------------------
+# read for Client
+
+
+class ProfileListForClientSchema(BaseModel):
+    """ NOTE: this schema includes field from both User and Profile models """
+    user_id: Annotated[int, Field(..., description="PK of profile (User ID)")]
+    display_name: Optional[str]
+    user: Annotated[UserOutForClientSchema, Field(
+        ..., description="Contains 'username' and 'id' of User model"
+    )]
+    # profile_photo
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ProfileDetailsForClientSchema(ProfileListForClientSchema):
+    """ NOTE: this schema includes field from both User and Profile models """
+    about: Optional[str]
+    birth_date: Optional[date]
+    gender: Gender
+    links: Annotated[Optional[list[LinkListSchema]], Field(
+        None, description="list of profile's links (if there is any)"
+    )]
+    follower_count: int
+    following_count: int
+    post_count: int
+
+    # ToDo: complete this later:
+    #   some recent 'posts'
+    #   or maybe:
+    #   pined + populars + recents (like YouTube) -> cached in redis
+
+
+# ------------------------------------------------
+# read for Admin
+
+
+class ProfileListForAdminPanelSchema(BaseModel):
+    """ NOTE: this schema includes field from both User and Profile models """
+    user_id: Annotated[int, Field(..., description="PK of profile (User ID)")]
+    display_name: Optional[str]
+    created_at: Annotated[datetime, Field(
+        ..., description="creation date and time (timestamp)"
+    )]
+    gender: Gender
+    user: Annotated[UserListForAdminSchema, Field(
+        ...,
+        description="Contains username, id, is_active & is_superuser of User"
+    )]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ProfileDetailsForAdminPanelSchema(ProfileListForAdminPanelSchema):
+    """ NOTE: this schema includes field from both User and Profile models """
+    about: Annotated[Optional[str], Field(None)]
+    updated_at: date  # Profile.updated_at
+    birth_date: Optional[date]
+    links: Annotated[Optional[list[LinkListSchema]], Field(
+        None, description="list of profile's links (if there is any)"
+    )]
+
+    # NOTE: overriding 'user' from ProfileListForAdminPanelSchema
+    user: Annotated[UserDetailsForAdminSchema, Field(
+        ...,
+        description="Contains username, id, is_active, is_superuser, email,"
+                    "created_at & updated_at of User model"
+    )]
+
+    # follower_count: int
+    # following_count: int
+    # 'posts'
+    # 'comments' ???
+
+    # profile_photo
