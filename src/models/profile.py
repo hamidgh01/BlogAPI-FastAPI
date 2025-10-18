@@ -43,10 +43,10 @@ class Link(Base):
 
 
 class Gender(PythonEnum):
-    MA = "Male"
-    FM = "Female"
-    OT = "Other"
-    NS = "Not-Specified"
+    MA = "male"
+    FM = "female"
+    OT = "other"
+    NS = "not-specified"
 
 
 class Profile(Base, UpdateAtFieldMixin):

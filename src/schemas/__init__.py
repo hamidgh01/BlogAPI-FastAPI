@@ -46,6 +46,8 @@ from .profile_sch import (
     CreateLinkSchema,
     UpdateLinkSchema,
     LinkListSchema,
+    InitialProfileSchema,
+    UpdateProfileSchema,
 )
 
 
@@ -92,4 +94,6 @@ __all__ = [
     "CreateLinkSchema",
     "UpdateLinkSchema",
     "LinkListSchema",
+    "InitialProfileSchema",
+    "UpdateProfileSchema",
 ]
