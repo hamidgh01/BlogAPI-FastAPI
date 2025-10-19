@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from pydantic import ValidationError
 import pytest
 
@@ -6,7 +8,11 @@ from src.schemas import (
     CreatePostSchema,
     UpdatePostSchema,
     ChangePostPrivacySchema,
-    UpdatePostStatusSchema
+    UpdatePostStatusSchema,
+    # PostListSchema,
+    PostDetailsSchema,  # includes all fields in PostListSchema
+    LikeUnlikePostSchema,
+    UserOutForClientSchema
 )
 
 # NOTE: there isn't any custom validator in 'Post' related Schemas, so
@@ -129,3 +135,58 @@ def test_healthiness_of_update_post_status_schema():
 
     msg = "Input should be 'draft', 'published', 'rejected' or 'deleted-by-au"
     assert msg in err.value.__str__()
+
+
+def test_healthiness_of_post_details_schema():
+    """test successful validation and serialization in PostDetailsSchema()"""
+    sch1 = PostDetailsSchema(
+        id=543,
+        title="test title",
+        created_at=datetime.now() - timedelta(days=54),
+        updated_at=datetime.now() - timedelta(days=2),
+        user=UserOutForClientSchema(
+            id=48,
+            username="hamid01"
+        ),
+        like_count=932,
+        comment_count=102
+    )
+    assert sch1.id == 543 and sch1.title == "test title"
+    assert sch1.updated_at > sch1.created_at
+    assert sch1.user.username == "hamid01"
+    assert type(sch1.like_count) is type(sch1.comment_count)
+    assert sch1.content is None and sch1.slug is None and sch1.tags is None
+    assert sch1.published_at is None and sch1.reading_time is None
+
+    sch2 = PostDetailsSchema(
+        id=543,
+        title="test title",
+        slug="test-title",
+        content="a long text as content of the post.\n" * 10,
+        reading_time=320,
+        created_at=datetime.now() - timedelta(days=54),
+        published_at=datetime.now() - timedelta(days=53),
+        updated_at=datetime.now() - timedelta(days=2),
+        user=UserOutForClientSchema(
+            id=48,
+            username="hamid01"
+        ),
+        like_count=932,
+        comment_count=102,
+        tags=[
+            ReadTagSchema(id=1, name="Python3"),
+            ReadTagSchema(id=2765, name="System_Design"),
+            ReadTagSchema(id=11234, name="زبان_پارسی")
+        ]
+    )
+    assert len(sch2.slug) == len(sch2.title)
+    assert "text as content of the post.\na long text" in sch2.content
+    assert type(sch2.reading_time) is int
+    assert type(sch2.published_at) is datetime
+    assert sch2.tags[0].id == 1 and sch2.tags[2].name == "زبان_پارسی"
+
+
+def test_healthiness_of_like_unlike_post_schema():
+    """test successful validation and serialization in LikeUnlikePostSchema"""
+    sch = LikeUnlikePostSchema(post_id=2345)
+    assert type(sch.post_id) is int and sch.post_id == 2345

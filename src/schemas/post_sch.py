@@ -139,7 +139,7 @@ class PostDetailsSchema(PostListSchema):
 
     like_count: int
     comment_count: int
-    tags: Optional[ReadTagSchema] = None
+    tags: Optional[list[ReadTagSchema]] = None
 
 
 class LikeUnlikePostSchema(BaseModel):
