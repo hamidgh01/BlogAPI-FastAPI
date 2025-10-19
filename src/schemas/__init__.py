@@ -17,6 +17,9 @@ from .post_sch import (
     ChangePostPrivacySchema,
     UpdatePostStatusSchema,
     ReadTagSchema,
+    PostListSchema,
+    PostDetailsSchema,
+    LikeUnlikePostSchema
 )
 from .ticket_sch import (
     CreateTicketSchema,
@@ -79,6 +82,9 @@ __all__ = [
     "ChangePostPrivacySchema",
     "UpdatePostStatusSchema",
     "ReadTagSchema",
+    "PostListSchema",
+    "PostDetailsSchema",
+    "LikeUnlikePostSchema",
     # Ticket Schemas
     "CreateTicketSchema",
     "UpdateTicketStatusForAdminSchema",

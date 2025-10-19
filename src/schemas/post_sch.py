@@ -2,10 +2,12 @@
 
 from typing import Annotated, Optional
 from re import compile
+from datetime import datetime
 
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 from src.models import PostStatus
+from .user_sch import UserOutForClientSchema
 
 
 TAG_NAME_PATTERN = compile(r"^[ا-یa-z0-9_]{1,120}$")
@@ -112,3 +114,36 @@ class ReadTagSchema(BaseModel):  # for both 'tag_list' and 'tag_details'
     name: Annotated[str, Field(..., description="unique tag name")]
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class PostListSchema(BaseModel):
+    id: int
+    title: str
+    slug: Optional[str] = None
+    reading_time: Annotated[Optional[int], Field(
+        None, description="Estimated reading time (minutes)"
+    )]
+    created_at: datetime
+    published_at: Optional[datetime] = None
+
+    user: Annotated[UserOutForClientSchema, Field(
+        ..., description="Contains 'username' and 'id' of related user"
+    )]
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class PostDetailsSchema(PostListSchema):
+    content: Optional[str] = None
+    updated_at: datetime
+
+    like_count: int
+    comment_count: int
+    tags: Optional[ReadTagSchema] = None
+
+
+class LikeUnlikePostSchema(BaseModel):
+    post_id: Annotated[int, Field(..., description="post ID to like/unlike")]
+    # user_id: int
+    #   -> ID of the user who wants to like or unlike a post
+    #   -> it'll be extracted form auth-token
