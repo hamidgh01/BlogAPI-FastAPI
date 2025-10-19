@@ -3,9 +3,7 @@
 from typing import Annotated, Optional
 from re import compile
 
-from pydantic import (
-    BaseModel, Field, field_validator, ConfigDict, ValidationError
-)
+from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 from src.models import PostStatus
 
@@ -14,16 +12,9 @@ TAG_NAME_PATTERN = compile(r"^[ا-یa-z0-9_]{1,120}$")
 
 
 def validate_tag_name(value: str) -> str:
-    if not TAG_NAME_PATTERN.fullmatch(value):
-        raise ValidationError(
-            "tag-name must be:\n"
-            "1 <= length <= 120\n"
-            "characters:\n"
-            "   Persian Alphabets (ا-ی)\n"
-            "   English-lowercase (a-z)\n"
-            "   numbers (0-9)\n"
-            "   _\n"
-            "(no white space characters)"
+    if not TAG_NAME_PATTERN.fullmatch(value.lower()):
+        raise ValueError(
+            "tag-name must match this pattern: ^[ا-یa-z0-9_]{1,120}$"
         )
     return value
 
