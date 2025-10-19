@@ -12,12 +12,11 @@ from .user_sch import (
     FollowerOrFollowingListSchema,
 )
 from .post_sch import (
-    CreateTagSchema,
-    ReadTagSchema,
     CreatePostSchema,
     UpdatePostSchema,
     ChangePostPrivacySchema,
-    UpdatePostStatusSchema
+    UpdatePostStatusSchema,
+    ReadTagSchema,
 )
 from .ticket_sch import (
     CreateTicketSchema,
@@ -75,12 +74,11 @@ __all__ = [
     "FollowOrUnfollowSchema",
     "FollowerOrFollowingListSchema",
     # Post & Tag Schemas
-    "CreateTagSchema",
-    "ReadTagSchema",
     "CreatePostSchema",
     "UpdatePostSchema",
     "ChangePostPrivacySchema",
     "UpdatePostStatusSchema",
+    "ReadTagSchema",
     # Ticket Schemas
     "CreateTicketSchema",
     "UpdateTicketStatusForAdminSchema",

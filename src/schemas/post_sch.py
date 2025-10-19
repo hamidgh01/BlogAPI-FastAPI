@@ -1,44 +1,31 @@
 """ Schemas (Pydantic models) for 'Post' & 'Tag' Models """
 
-from typing import Annotated, List, Optional
-from re import fullmatch
+from typing import Annotated, Optional
+from re import compile
 
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import (
+    BaseModel, Field, field_validator, ConfigDict, ValidationError
+)
 
 from src.models import PostStatus
 
-# --------------------------------------------------------------------
 
-# Tag Schemas:
-
-
-class CreateTagSchema(BaseModel):
-    name: Annotated[str, Field(
-        ..., min_length=1, max_length=120, description="unique tag name"
-    )]
-
-    @field_validator("name")
-    @classmethod
-    def check_name(cls, value):
-        if value and not fullmatch(r"[ا-یa-zA-Z0-9_]{1,120}", value):
-            raise ValueError("[name] length <= 120  |  allowed characters: "
-                             "Persian/English Alphabets , numbers , _ ")
-        return value
-    # NOTE:
-    # because of 'mode="after"' in above field_validator, and 'max_length=120'
-    # in 'name' field --> 'length <= 120' is validated by Pydantic itself
+TAG_NAME_PATTERN = compile(r"^[ا-یa-z0-9_]{1,120}$")
 
 
-class ReadTagSchema(BaseModel):  # for both 'tag_list' and 'tag_details'
-    id: Annotated[int, Field(..., description="unique tag ID")]
-    name: Annotated[str, Field(..., description="unique tag name")]
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-# --------------------------------------------------------------------
-
-# Post Schemas:
+def validate_tag_name(value: str) -> str:
+    if not TAG_NAME_PATTERN.fullmatch(value):
+        raise ValidationError(
+            "tag-name must be:\n"
+            "1 <= length <= 120\n"
+            "characters:\n"
+            "   Persian Alphabets (ا-ی)\n"
+            "   English-lowercase (a-z)\n"
+            "   numbers (0-9)\n"
+            "   _\n"
+            "(no white space characters)"
+        )
+    return value
 
 
 class CreatePostSchema(BaseModel):
@@ -63,10 +50,23 @@ class CreatePostSchema(BaseModel):
     # NOTE:
     # 'slug' and 'reading_time' is generated in backend
 
-    tags: Annotated[Optional[List[str | int]], Field(
-        None, description="List of tag_id (existing tags) or "
-                          "tag_names (not exists -> will be created)"
-    )]  # int -> tag_id -> existing tag / str -> tag_name -> creating new tag
+    tags: Annotated[Optional[list[str]], Field(
+        default_factory=list,
+        description="List of tag_names\n"
+                    "each tag-name must be:\n"
+                    "1 <= length <= 120\n"
+                    "characters:\n"
+                    "   Persian Alphabets (ا-ی)\n"
+                    "   English-lowercase (a-z)\n"
+                    "   numbers (0-9)\n"
+                    "   _\n"
+                    "(no white space characters)"
+    )]
+
+    @field_validator("tags")
+    @classmethod
+    def validate_tags(cls, tags: list[str]) -> list[str]:
+        return [validate_tag_name(tag) for tag in tags]
 
 
 class UpdatePostSchema(BaseModel):
@@ -76,12 +76,26 @@ class UpdatePostSchema(BaseModel):
     content: Annotated[Optional[str], Field(
         None, description="Post content (text)"
     )]
-    tags: Annotated[Optional[List[str | int]], Field(
-        None, description="List of tag_id (existing) or tag_names (to create)"
-    )]
     is_private: Annotated[Optional[bool], Field(
         default=False, description="being Private/Public (default: public)"
     )]
+    tags: Annotated[Optional[list[str]], Field(
+        default_factory=list,
+        description="List of tag_names\n"
+                    "each tag-name must be:\n"
+                    "1 <= length <= 120\n"
+                    "characters:\n"
+                    "   Persian Alphabets (ا-ی)\n"
+                    "   English-lowercase (a-z)\n"
+                    "   numbers (0-9)\n"
+                    "   _\n"
+                    "(no white space characters)"
+    )]
+
+    @field_validator("tags")
+    @classmethod
+    def validate_tags(cls, tags: list[str]) -> list[str]:
+        return [validate_tag_name(tag) for tag in tags]
 
 
 class ChangePostPrivacySchema(BaseModel):
@@ -100,3 +114,10 @@ class UpdatePostStatusSchema(BaseModel):
     # _ user deletes a draft/published post -> status=PostStatus.DL ("Deleted")
     # _ admin rejects a post -> status=PostStatus.RJ ("Rejected")
     # (a user can't draft a published post again! but it can make that private)
+
+
+class ReadTagSchema(BaseModel):  # for both 'tag_list' and 'tag_details'
+    id: Annotated[int, Field(..., description="unique tag ID")]
+    name: Annotated[str, Field(..., description="unique tag name")]
+
+    model_config = ConfigDict(from_attributes=True)
