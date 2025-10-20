@@ -5,16 +5,19 @@ import pytest
 from src.schemas import (
     CreateUserSchema,
     UpdateUserSchema,
-    UpdateUserForAdminSchema,
     UpdatePasswordSchema,
     # SetNewPassword,  Doesn't need to be tested
     UserLoginSchema,
-    UserOutForClientSchema,
-    # UserListForAdminSchema,  Doesn't need to be tested
-    UserDetailsForAdminSchema,  # includes all fields in UserListForAdminSchema
+    UserOutSchema,
     FollowOrUnfollowSchema,
     FollowerOrFollowingListSchema
 )
+from src.schemas.admin import (
+    UpdateUserForAdminSchema,
+    # UserListSchema,
+    UserDetailsForAdminSchema  # includes all fields in UserListSchema
+)
+
 # NOTE: repeated functionalities and validation in different Schemas
 # is tested just for one time!
 
@@ -145,12 +148,11 @@ def test_healthiness_of_user_login_schema():
     assert sch2.identifier == "hamid@example.com"
 
 
-def test_healthiness_of_user_out_for_client_schema():
-    """ test successful validation and serialization
-    in UserOutForClientSchema() """
+def test_healthiness_of_user_out_schema():
+    """ test successful validation and serialization in UserOutSchema() """
 
-    sch = UserOutForClientSchema(id=12345, username="hamid01")
-    assert type(sch.id) is int and sch.id == 12345
+    sch = UserOutSchema(ID=12345, username="hamid01")
+    assert type(sch.ID) is int and sch.ID == 12345
     assert sch.username == "hamid01"
 
 
@@ -159,7 +161,7 @@ def test_healthiness_of_user_details_for_admin_schema():
     test successful validation and serialization in UserDetailsForAdminSchema()
     """
     sch = UserDetailsForAdminSchema(
-        id=543,
+        ID=543,
         username="test",
         is_active=True,
         is_superuser=False,
@@ -167,7 +169,7 @@ def test_healthiness_of_user_details_for_admin_schema():
         created_at=datetime.now() - timedelta(days=30),
         updated_at=datetime.now() - timedelta(days=2),
     )
-    assert sch.id == 543 and sch.username == "test"
+    assert sch.ID == 543 and sch.username == "test"
     assert type(sch.is_active) is bool
     assert sch.is_superuser is False
     assert sch.email == "test@example.com"
@@ -187,8 +189,8 @@ def test_healthiness_of_follower_or_following_list_schema():
     """ test successful validation and serialization
     in FollowerOrFollowingListSchema() """
 
-    u_out_sch_1 = UserOutForClientSchema(id=12345, username="hamid01")
-    u_out_sch_2 = UserOutForClientSchema(id=1655, username="nobody")
+    u_out_sch_1 = UserOutSchema(ID=12345, username="hamid01")
+    u_out_sch_2 = UserOutSchema(ID=1655, username="nobody")
 
     sch1 = FollowerOrFollowingListSchema()
     sch2 = FollowerOrFollowingListSchema(users_list=[u_out_sch_1])
@@ -197,5 +199,5 @@ def test_healthiness_of_follower_or_following_list_schema():
     assert sch2.users_list is not None
     assert sch2.users_list[0].username == "hamid01"
     assert len(sch3.users_list) > 1
-    assert sch3.users_list[1].id == 1655
+    assert sch3.users_list[1].ID == 1655
     assert sch3.users_list[1].username == "nobody"

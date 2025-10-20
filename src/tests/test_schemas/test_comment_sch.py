@@ -7,9 +7,9 @@ from src.schemas import (
     CreateCommentSchema,
     UpdateCommentContentSchema,
     UpdateCommentStatusSchema,
-    # CommentListSchema,
     CommentDetailsSchema  # includes all fields in CommentListSchema
 )
+# from src.schemas.admin import CommentListSchema
 
 # NOTE: there isn't any custom validator in 'Comment' related Schemas, so
 # only the healthiness of these Schemas is tested here.
@@ -80,7 +80,7 @@ def test_healthiness_of_comment_details_schema():
     """
     yesterday = datetime.now() - timedelta(days=1)
     cm_dt_sch1 = CommentDetailsSchema(
-        id=1265,
+        ID=1265,
         user_id=654312345,
         content="a long text (maximum = 1000 characters) as comment. \n" * 10,
         status="published",
@@ -89,7 +89,7 @@ def test_healthiness_of_comment_details_schema():
         parent_type="post",
         parent_id=898454,
     )
-    assert cm_dt_sch1.id == 1265
+    assert cm_dt_sch1.ID == 1265
     assert cm_dt_sch1.user_id == 654312345
     assert " as comment. \na long text (maximum = 1000 c" in cm_dt_sch1.content
     assert cm_dt_sch1.status.value == "published"

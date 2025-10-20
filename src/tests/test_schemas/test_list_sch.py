@@ -56,7 +56,7 @@ def test_healthiness_of_list_details_schema():
     now_ = datetime.now()
     one_mont_age = now_ - timedelta(days=30)
     ls_dt_sch = ListDetailsSchema(
-        id=1234,
+        ID=1234,
         title="Developing HTTP server with Golang seri",
         description="this playlist includes a seri of posts explaining the "
                     "development process of an HTTP server step-by-step...",
@@ -66,7 +66,7 @@ def test_healthiness_of_list_details_schema():
         post_count=32,
         saved_by_viewer=True
     )
-    assert type(ls_dt_sch.id) is int
+    assert type(ls_dt_sch.ID) is int
     assert "HTTP server with Golang" in ls_dt_sch.title
     assert "seri of posts explaining the development" in ls_dt_sch.description
     assert ls_dt_sch.is_private is False

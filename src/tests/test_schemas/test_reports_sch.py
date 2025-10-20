@@ -5,9 +5,11 @@ import pytest
 
 from src.schemas import (
     CreateReportOnUserSchema,
+    CreateReportOnPostSchema
+)
+from src.schemas.admin import (
     # ReportOnUserListSchema,
     ReportOnUserDetailsSchema,  # includes all fields in ReportOnUserListSchema
-    CreateReportOnPostSchema,
     # ReportOnPostListSchema,
     ReportOnPostDetailsSchema  # includes all fields in ReportOnPostListSchema
 )
@@ -85,13 +87,13 @@ def test_healthiness_of_both_reports_details_schemas():
     now_ = datetime.now()
 
     rp_u_dt_sch = ReportOnUserDetailsSchema(
-        id=6543,
+        ID=6543,
         reporter_id=765434,
         reported_user_id=21345,
         title="User-Report Reason 1",
         created_at=now_,
     )
-    assert type(rp_u_dt_sch.id) is int
+    assert type(rp_u_dt_sch.ID) is int
     assert isinstance(rp_u_dt_sch.reporter_id, int) is True
     assert isinstance(rp_u_dt_sch.reported_user_id, int) is True
     assert rp_u_dt_sch.description is None
@@ -99,14 +101,14 @@ def test_healthiness_of_both_reports_details_schemas():
     assert type(rp_u_dt_sch.created_at) is datetime
 
     rp_p_dt_sch = ReportOnPostDetailsSchema(
-        id=2345987,
+        ID=2345987,
         reporter_id=4444444333333,
         reported_user_id=2345678999999,
         title="Other",
         description="some text as report description",
         created_at=now_ - timedelta(days=12, hours=17),
     )
-    assert type(rp_p_dt_sch.id) is int
+    assert type(rp_p_dt_sch.ID) is int
     assert rp_p_dt_sch.reporter_id, int == 4444444333333
     assert type(rp_p_dt_sch.reported_user_id) is int
     assert rp_p_dt_sch.description is not None

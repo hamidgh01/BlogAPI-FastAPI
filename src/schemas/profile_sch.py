@@ -44,7 +44,7 @@ class UpdateLinkSchema(BaseModel):
 
 
 class LinkListSchema(_BaseLinkSchema):
-    id: Annotated[int, Field(..., description="Unique link ID")]
+    ID: Annotated[int, Field(..., description="Unique link ID")]
     model_config = ConfigDict(from_attributes=True)
 
 

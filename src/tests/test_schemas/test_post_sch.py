@@ -12,7 +12,11 @@ from src.schemas import (
     # PostListSchema,
     PostDetailsSchema,  # includes all fields in PostListSchema
     LikeUnlikePostSchema,
-    UserOutForClientSchema
+    UserOutSchema
+)
+from src.schemas.admin import (
+    # PostListForAdminSchema,
+    PostDetailsForAdminSchema  # includes all fields in ...
 )
 
 # NOTE: there isn't any custom validator in 'Post' related Schemas, so
@@ -44,10 +48,10 @@ def test_invalid_tag_name_patterns(invalid_tag_name):
 
 def test_healthiness_of_read_tag_scheme():
     """ test successful validation and serialization in ReadTagSchema() """
-    tag_sch4 = ReadTagSchema(id=1, name="Python3")
-    tag_sch5 = ReadTagSchema(id=2765, name="System_Design")
-    tag_sch6 = ReadTagSchema(id=11234, name="زبان_پارسی")
-    assert tag_sch4.id == 1
+    tag_sch4 = ReadTagSchema(ID=1, name="Python3")
+    tag_sch5 = ReadTagSchema(ID=2765, name="System_Design")
+    tag_sch6 = ReadTagSchema(ID=11234, name="زبان_پارسی")
+    assert tag_sch4.ID == 1
     assert tag_sch4.name == "Python3"
     assert tag_sch5.name == "System_Design"
     assert tag_sch6.name == "زبان_پارسی"
@@ -140,12 +144,12 @@ def test_healthiness_of_update_post_status_schema():
 def test_healthiness_of_post_details_schema():
     """test successful validation and serialization in PostDetailsSchema()"""
     sch1 = PostDetailsSchema(
-        id=543,
+        ID=543,
         title="test title",
         created_at=datetime.now() - timedelta(days=54),
         updated_at=datetime.now() - timedelta(days=2),
-        user=UserOutForClientSchema(
-            id=48,
+        user=UserOutSchema(
+            ID=48,
             username="hamid01"
         ),
         like_count=932,
@@ -153,7 +157,7 @@ def test_healthiness_of_post_details_schema():
         saved_by_viewer=False,
         liked_by_viewer=True,
     )
-    assert sch1.id == 543 and sch1.title == "test title"
+    assert sch1.ID == 543 and sch1.title == "test title"
     assert sch1.updated_at > sch1.created_at
     assert sch1.user.username == "hamid01"
     assert type(sch1.like_count) is type(sch1.comment_count)
@@ -162,7 +166,7 @@ def test_healthiness_of_post_details_schema():
     assert sch1.saved_by_viewer is False and sch1.liked_by_viewer is True
 
     sch2 = PostDetailsSchema(
-        id=543,
+        ID=543,
         title="test title",
         slug="test-title",
         content="a long text as content of the post.\n" * 10,
@@ -170,16 +174,16 @@ def test_healthiness_of_post_details_schema():
         created_at=datetime.now() - timedelta(days=54),
         published_at=datetime.now() - timedelta(days=53),
         updated_at=datetime.now() - timedelta(days=2),
-        user=UserOutForClientSchema(
-            id=48,
+        user=UserOutSchema(
+            ID=48,
             username="hamid01"
         ),
         like_count=932,
         comment_count=102,
         tags=[
-            ReadTagSchema(id=1, name="Python3"),
-            ReadTagSchema(id=2765, name="System_Design"),
-            ReadTagSchema(id=11234, name="زبان_پارسی")
+            ReadTagSchema(ID=1, name="Python3"),
+            ReadTagSchema(ID=2765, name="System_Design"),
+            ReadTagSchema(ID=11234, name="زبان_پارسی")
         ],
         saved_by_viewer=False,
         liked_by_viewer=True,
@@ -188,7 +192,71 @@ def test_healthiness_of_post_details_schema():
     assert "text as content of the post.\na long text" in sch2.content
     assert type(sch2.reading_time) is int
     assert type(sch2.published_at) is datetime
-    assert sch2.tags[0].id == 1 and sch2.tags[2].name == "زبان_پارسی"
+    assert sch2.tags[0].ID == 1 and sch2.tags[2].name == "زبان_پارسی"
+
+
+def test_healthiness_of_post_details_for_admin_schema():
+    """ test successful validation and serialization
+    in PostDetailsForAdminSchema() """
+
+    sch1 = PostDetailsForAdminSchema(
+        ID=543,
+        title="test title",
+        created_at=datetime.now() - timedelta(days=54),
+        updated_at=datetime.now() - timedelta(days=2),
+        is_private=False,
+        status="published",
+        user=UserOutSchema(
+            ID=48,
+            username="hamid01"
+        ),
+        like_count=932,
+        comment_count=102,
+        saved_by_viewer=False,
+        liked_by_viewer=True,
+    )
+    assert sch1.ID == 543 and sch1.title == "test title"
+    assert sch1.updated_at > sch1.created_at
+    assert sch1.is_private is False
+    assert sch1.status.name == "PB"
+    assert sch1.user.username == "hamid01"
+    assert type(sch1.like_count) is type(sch1.comment_count)
+    assert sch1.content is None and sch1.slug is None and sch1.tags is None
+    assert sch1.published_at is None and sch1.reading_time is None
+    assert sch1.saved_by_viewer is False and sch1.liked_by_viewer is True
+
+    sch2 = PostDetailsForAdminSchema(
+        ID=543,
+        title="test title",
+        slug="test-title",
+        content="a long text as content of the post.\n" * 10,
+        reading_time=320,
+        created_at=datetime.now() - timedelta(days=54),
+        published_at=datetime.now() - timedelta(days=53),
+        updated_at=datetime.now() - timedelta(days=2),
+        is_private=True,
+        status="draft",
+        user=UserOutSchema(
+            ID=48,
+            username="hamid01"
+        ),
+        like_count=932,
+        comment_count=102,
+        tags=[
+            ReadTagSchema(ID=1, name="Python3"),
+            ReadTagSchema(ID=2765, name="System_Design"),
+            ReadTagSchema(ID=11234, name="زبان_پارسی")
+        ],
+        saved_by_viewer=False,
+        liked_by_viewer=True,
+    )
+    assert len(sch2.slug) == len(sch2.title)
+    assert "text as content of the post.\na long text" in sch2.content
+    assert type(sch2.is_private) is bool
+    assert sch2.status.value == "draft" and sch2.status.name == "DR"
+    assert type(sch2.reading_time) is int
+    assert type(sch2.published_at) is datetime
+    assert sch2.tags[0].ID == 1 and sch2.tags[2].name == "زبان_پارسی"
 
 
 def test_healthiness_of_like_unlike_post_schema():

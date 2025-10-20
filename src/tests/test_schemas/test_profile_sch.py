@@ -7,13 +7,15 @@ from src.schemas import (
     # CreateLinkSchema,  # Doesn't need to be tested
     UpdateLinkSchema,
     LinkListSchema,  # includes all fields in CreateLinkSchema
-    # InitialProfileSchema,  # Doesn't need to be tested
-    UpdateProfileSchema,
-    # ProfileListForClientSchema,  # Doesn't need to be tested
-    ProfileDetailsForClientSchema,
+    # InitialProfileSchema,
+    UpdateProfileSchema,  # includes all fields in InitialProfileSchema
+    # ProfileListSchema,
+    ProfileDetailsSchema,  # includes all fields in ProfileListSchema
+    UserOutSchema
+)
+from src.schemas.admin import (
     # ProfileListForAdminPanelSchema,  # Doesn't need to be tested
     ProfileDetailsForAdminPanelSchema,
-    UserOutForClientSchema,
     UserDetailsForAdminSchema
 )
 
@@ -49,12 +51,12 @@ def test_healthiness_of_update_link_schema():
 def test_healthiness_of_link_list_schema():
     """ test successful validation and serialization in LinkListSchema() """
     sch = LinkListSchema(
-        id=8765432134,
+        ID=8765432134,
         title="youtube",
         url="https://toplevel.example.com/path/to/details",
         profile_id=765
     )
-    assert type(sch.id) is int
+    assert type(sch.ID) is int
     assert sch.title is not None
     assert sch.profile_id == 765
     assert ".example.com/path/to/details" in sch.url.encoded_string()
@@ -88,30 +90,29 @@ def test_healthiness_of_update_profile_schema():
     assert "'male', 'female', 'other' or 'not-specified'" in str(err.value)
 
 
-def test_healthiness_of_profile_details_for_client_schema():
-    """ test successful validation and serialization
-    in ProfileDetailsForClientSchema() """
+def test_healthiness_of_profile_details_schema():
+    """test successful validation and serialization in ProfileDetailsSchema"""
 
-    sch1 = ProfileDetailsForClientSchema(
+    sch1 = ProfileDetailsSchema(
         user_id=544,
         follower_count=143,
         following_count=24,
         post_count=0,
         gender="female",
-        user=UserOutForClientSchema(
-            id=544,
+        user=UserOutSchema(
+            ID=544,
             username="golang_lover"
         ),
         followed_by_viewer=False
     )
 
-    assert sch1.user_id == sch1.user.id
+    assert sch1.user_id == sch1.user.ID
     assert type(sch1.post_count) is type(sch1.following_count)
     assert sch1.user.username == "golang_lover"
     assert sch1.gender.value == "female" and sch1.gender.name == "FM"
     assert type(sch1.followed_by_viewer) is bool
 
-    sch2 = ProfileDetailsForClientSchema(
+    sch2 = ProfileDetailsSchema(
         user_id=48,
         display_name="john doe",
         about="a long description ad bio or about.\n" * 4,
@@ -119,13 +120,13 @@ def test_healthiness_of_profile_details_for_client_schema():
         birth_date=date(year=1988, month=6, day=29),
         links=[
             LinkListSchema(
-                id=8721,
+                ID=8721,
                 title="youtube",
                 url="https://youtube.com/path/to/my/channel",
                 profile_id=48
             ),
             LinkListSchema(
-                id=3467,
+                ID=3467,
                 title="github",
                 url="https://github.com/hamidgh01",
                 profile_id=48
@@ -134,15 +135,15 @@ def test_healthiness_of_profile_details_for_client_schema():
         follower_count=76,
         following_count=201,
         post_count=14,
-        user=UserOutForClientSchema(
-            id=48,
+        user=UserOutSchema(
+            ID=48,
             username="abcdefgh"
         ),
         followed_by_viewer=False
     )
 
-    assert sch2.user_id == sch2.user.id
-    assert sch2.user.id == sch2.links[0].profile_id
+    assert sch2.user_id == sch2.user.ID
+    assert sch2.user.ID == sch2.links[0].profile_id
     assert type(sch2.about) is str
     assert sch2.display_name == "john doe"
     assert sch2.gender.name == "MA" and sch2.gender.value == "male"
@@ -166,7 +167,7 @@ def test_healthiness_of_profile_details_for_admin_panel_schema():
         updated_at=datetime.now() - timedelta(days=2),
         gender="not-specified",
         user=UserDetailsForAdminSchema(
-            id=544,
+            ID=544,
             username="golang_lover",
             is_active=True,
             is_superuser=False,
@@ -177,7 +178,7 @@ def test_healthiness_of_profile_details_for_admin_panel_schema():
     )
 
     assert sch1.display_name is None and sch1.about is None
-    assert sch1.user_id == sch1.user.id
+    assert sch1.user_id == sch1.user.ID
     assert sch1.created_at == sch1.user.created_at
     assert sch1.updated_at > sch1.created_at
     assert sch1.gender.name == "NS"
@@ -193,20 +194,20 @@ def test_healthiness_of_profile_details_for_admin_panel_schema():
         birth_date=date(year=1988, month=6, day=29),
         links=[
             LinkListSchema(
-                id=8721,
+                ID=8721,
                 title="youtube",
                 url="https://youtube.com/path/to/my/channel",
                 profile_id=544
             ),
             LinkListSchema(
-                id=3467,
+                ID=3467,
                 title="github",
                 url="https://github.com/hamidgh01",
                 profile_id=544
             ),
         ],
         user=UserDetailsForAdminSchema(
-            id=544,
+            ID=544,
             username="golang_lover",
             is_active=True,
             is_superuser=False,
@@ -219,7 +220,7 @@ def test_healthiness_of_profile_details_for_admin_panel_schema():
     assert sch2.display_name is not None and sch2.about is not None
     assert type(sch2.birth_date) is date
     assert sch2.birth_date.strftime("%B") == "June"
-    assert sch2.user_id == sch2.user.id
+    assert sch2.user_id == sch2.user.ID
     assert sch2.user_id == sch2.links[0].profile_id
     assert sch2.created_at == sch2.user.created_at
     assert sch2.gender.name == "OT" and sch2.gender.value == "other"

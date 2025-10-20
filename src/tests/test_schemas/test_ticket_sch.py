@@ -3,9 +3,9 @@ from datetime import datetime
 from pydantic import ValidationError
 import pytest
 
-from src.schemas import (
-    CreateTicketSchema,
-    UpdateTicketStatusForAdminSchema,
+from src.schemas import CreateTicketSchema
+from src.schemas.admin import (
+    UpdateTicketStatusSchema,
     # TicketListSchema,
     TicketDetailsSchema  # includes all fields in TicketListSchema
 )
@@ -35,19 +35,20 @@ def test_healthiness_of_create_ticket_scheme():
     assert "String should have at most 120 characters" in str(err.value)
 
 
-def test_healthiness_of_update_ticket_status_for_admin_schema():
-    """ test successful validation and serialization
-    in UpdateTicketStatusForAdminSchema() """
+def test_healthiness_of_update_ticket_status_schema():
+    """
+    test successful validation and serialization in UpdateTicketStatusSchema()
+    """
 
-    t_st_sch1 = UpdateTicketStatusForAdminSchema(status="read")
-    t_st_sch2 = UpdateTicketStatusForAdminSchema(status="unread")
-    t_st_sch3 = UpdateTicketStatusForAdminSchema(status="closed")
+    t_st_sch1 = UpdateTicketStatusSchema(status="read")
+    t_st_sch2 = UpdateTicketStatusSchema(status="unread")
+    t_st_sch3 = UpdateTicketStatusSchema(status="closed")
     assert t_st_sch1.status.value == "read" and t_st_sch1.status.name == "R"
     assert t_st_sch2.status.value == "unread" and t_st_sch2.status.name == "N"
     assert t_st_sch3.status.value == "closed" and t_st_sch3.status.name == "C"
 
     with pytest.raises(ValidationError) as err:
-        UpdateTicketStatusForAdminSchema(status="shit...")
+        UpdateTicketStatusSchema(status="shit...")
     msg = "Input should be 'unread', 'read' or 'closed'"
     assert msg in err.value.__str__()
 
@@ -57,14 +58,14 @@ def test_healthiness_of_ticket_details_schema():
 
     now_ = datetime.now()
     t_dt_sch1 = TicketDetailsSchema(
-        id=1265,
+        ID=1265,
         subject="something as title",
         message="a long text (maximum = 4000 characters) as message. \n" * 20,
         status="unread",
         created_at=now_,
         user_id=89236423
     )
-    assert t_dt_sch1.id == 1265
+    assert t_dt_sch1.ID == 1265
     assert t_dt_sch1.subject == "something as title"
     assert "as message. \na long text (maximum = 4000" in t_dt_sch1.message
     assert t_dt_sch1.status.value == "unread" and t_dt_sch1.status.name == "N"
@@ -72,7 +73,7 @@ def test_healthiness_of_ticket_details_schema():
     assert t_dt_sch1.user_id == 89236423
 
     t_dt_sch2 = TicketDetailsSchema(
-        id=1265,
+        ID=1265,
         message="a long text (maximum = 4000 characters) as message. \n" * 20,
         status="unread",
         created_at=now_,
