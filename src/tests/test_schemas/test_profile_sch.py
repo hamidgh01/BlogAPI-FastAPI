@@ -101,13 +101,15 @@ def test_healthiness_of_profile_details_for_client_schema():
         user=UserOutForClientSchema(
             id=544,
             username="golang_lover"
-        )
+        ),
+        followed_by_viewer=False
     )
 
     assert sch1.user_id == sch1.user.id
     assert type(sch1.post_count) is type(sch1.following_count)
     assert sch1.user.username == "golang_lover"
     assert sch1.gender.value == "female" and sch1.gender.name == "FM"
+    assert type(sch1.followed_by_viewer) is bool
 
     sch2 = ProfileDetailsForClientSchema(
         user_id=48,
@@ -135,7 +137,8 @@ def test_healthiness_of_profile_details_for_client_schema():
         user=UserOutForClientSchema(
             id=48,
             username="abcdefgh"
-        )
+        ),
+        followed_by_viewer=False
     )
 
     assert sch2.user_id == sch2.user.id

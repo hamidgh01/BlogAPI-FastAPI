@@ -149,7 +149,9 @@ def test_healthiness_of_post_details_schema():
             username="hamid01"
         ),
         like_count=932,
-        comment_count=102
+        comment_count=102,
+        saved_by_viewer=False,
+        liked_by_viewer=True,
     )
     assert sch1.id == 543 and sch1.title == "test title"
     assert sch1.updated_at > sch1.created_at
@@ -157,6 +159,7 @@ def test_healthiness_of_post_details_schema():
     assert type(sch1.like_count) is type(sch1.comment_count)
     assert sch1.content is None and sch1.slug is None and sch1.tags is None
     assert sch1.published_at is None and sch1.reading_time is None
+    assert sch1.saved_by_viewer is False and sch1.liked_by_viewer is True
 
     sch2 = PostDetailsSchema(
         id=543,
@@ -177,7 +180,9 @@ def test_healthiness_of_post_details_schema():
             ReadTagSchema(id=1, name="Python3"),
             ReadTagSchema(id=2765, name="System_Design"),
             ReadTagSchema(id=11234, name="زبان_پارسی")
-        ]
+        ],
+        saved_by_viewer=False,
+        liked_by_viewer=True,
     )
     assert len(sch2.slug) == len(sch2.title)
     assert "text as content of the post.\na long text" in sch2.content

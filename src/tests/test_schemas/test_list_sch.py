@@ -62,7 +62,9 @@ def test_healthiness_of_list_details_schema():
                     "development process of an HTTP server step-by-step...",
         is_private=False,
         created_at=one_mont_age,
-        user_id=752443
+        user_id=752443,
+        post_count=32,
+        saved_by_viewer=True
     )
     assert type(ls_dt_sch.id) is int
     assert "HTTP server with Golang" in ls_dt_sch.title
@@ -70,6 +72,8 @@ def test_healthiness_of_list_details_schema():
     assert ls_dt_sch.is_private is False
     assert isinstance(ls_dt_sch.created_at, datetime) is True
     assert ls_dt_sch.user_id == 752443
+    assert ls_dt_sch.post_count == 32
+    assert ls_dt_sch.saved_by_viewer is True
 
 
 def test_healthiness_of_save_or_unsave_for_both_posts_and_lists_schema():
