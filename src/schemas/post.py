@@ -7,7 +7,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 from src.models import PostStatus
-from .user_sch import UserOutSchema
+from .user import UserOutSchema
 
 
 TAG_NAME_PATTERN = compile(r"^[ا-یa-z0-9_]{1,120}$")

@@ -1,4 +1,4 @@
-from .user_sch import (
+from .user import (
     CreateUserSchema,
     UpdateUserSchema,
     UpdatePasswordSchema,
@@ -8,7 +8,7 @@ from .user_sch import (
     FollowOrUnfollowSchema,
     FollowerOrFollowingListSchema,
 )
-from .post_sch import (
+from .post import (
     CreatePostSchema,
     UpdatePostSchema,
     ChangePostPrivacySchema,
@@ -18,14 +18,14 @@ from .post_sch import (
     PostDetailsSchema,
     LikeUnlikePostSchema
 )
-from .ticket_sch import CreateTicketSchema
-from .comment_sch import (
+from .ticket import CreateTicketSchema
+from .comment import (
     CreateCommentSchema,
     UpdateCommentContentSchema,
     UpdateCommentStatusSchema,
     CommentDetailsSchema
 )
-from .list_sch import (
+from .list import (
     CreateListSchema,
     UpdateListSchema,
     ListListSchema,
@@ -33,11 +33,11 @@ from .list_sch import (
     SaveOrUnsavePost,
     SaveOrUnsaveList
 )
-from .reports_sch import (
+from .reports import (
     CreateReportOnUserSchema,
     CreateReportOnPostSchema
 )
-from .profile_sch import (
+from .profile import (
     CreateLinkSchema,
     UpdateLinkSchema,
     LinkListSchema,

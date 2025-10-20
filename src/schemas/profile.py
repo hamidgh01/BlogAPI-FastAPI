@@ -6,7 +6,7 @@ from datetime import date
 from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 
 from src.models import Gender
-from .user_sch import UserOutSchema
+from .user import UserOutSchema
 
 # ----------------------------------------------------------
 # Link Schemas (part of Profile)

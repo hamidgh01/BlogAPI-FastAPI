@@ -6,8 +6,8 @@ from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict
 
 from src.models import PostStatus
-from ..user_sch import UserOutSchema
-from ..post_sch import ReadTagSchema
+from ..user import UserOutSchema
+from ..post import ReadTagSchema
 
 
 class PostListForAdminSchema(BaseModel):

@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, ConfigDict
 
 from src.models import Gender
 from .user import UserListSchema, UserDetailsForAdminSchema
-from ..profile_sch import LinkListSchema
+from ..profile import LinkListSchema
 
 
 class ProfileListForAdminPanelSchema(BaseModel):
