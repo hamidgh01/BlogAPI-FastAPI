@@ -43,7 +43,12 @@ class ListListSchema(BaseModel):
         ..., description="creation date and time (timestamp)"
     )]
     user_id: Annotated[int, Field(..., description="Owner user ID")]
-    # Todo: add post_count field later
+    post_count: int
+    saved_by_viewer: Annotated[bool, Field(
+        ...,
+        description="indicates that the viewer (current user) "
+                    "saved this list or not (true/false)"
+    )]
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -115,11 +115,20 @@ class ProfileDetailsForClientSchema(ProfileListForClientSchema):
     following_count: int
     post_count: int
 
+    followed_by_viewer: Annotated[bool, Field(
+        ...,
+        description="indicates whether the current profile is followed "
+                    "by the viewer (current user) or not (true/false)"
+    )]
+
     # ToDo: complete this later:
     #   some recent 'posts'
     #   or maybe:
     #   pined + populars + recents (like YouTube) -> cached in redis
 
+
+# ToDo: add this later
+# class Me...  # current user's own profile
 
 # ------------------------------------------------
 # read for Admin

@@ -121,13 +121,19 @@ class PostListSchema(BaseModel):
     title: str
     slug: Optional[str] = None
     reading_time: Annotated[Optional[int], Field(
-        None, description="Estimated reading time (minutes)"
+        None, description="Estimated reading time (seconds)"
     )]
     created_at: datetime
     published_at: Optional[datetime] = None
 
     user: Annotated[UserOutForClientSchema, Field(
         ..., description="Contains 'username' and 'id' of related user"
+    )]
+
+    saved_by_viewer: Annotated[bool, Field(
+        ...,
+        description="indicates that the viewer (current user) "
+                    "saved this post or not (true/false)"
     )]
 
     model_config = ConfigDict(from_attributes=True)
@@ -140,6 +146,12 @@ class PostDetailsSchema(PostListSchema):
     like_count: int
     comment_count: int
     tags: Optional[list[ReadTagSchema]] = None
+
+    liked_by_viewer: Annotated[bool, Field(
+        ...,
+        description="indicates that the viewer (current user) "
+                    "liked this post or not (true/false)"
+    )]
 
 
 class LikeUnlikePostSchema(BaseModel):
