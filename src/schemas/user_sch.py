@@ -1,7 +1,6 @@
 """ Schemas (Pydantic models) for 'User' Model """
 
 from typing import Annotated, Optional
-from datetime import datetime
 from re import fullmatch
 
 from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict
@@ -81,15 +80,6 @@ class UpdateUserSchema(_BaseUpdateUserSchema):
     pass
 
 
-class UpdateUserForAdminSchema(_BaseUpdateUserSchema):
-    is_active: Annotated[bool | None, Field(
-        ..., description="(Dangerous) suspend/activate a User"
-    )]
-    is_superuser: Annotated[bool | None, Field(
-        ..., description="(too much Dangerous!!!) make a User as superuser"
-    )]
-
-
 class UpdatePasswordSchema(_SetPasswordOperationSchema):
     old_password: Annotated[str, Field(
         ..., min_length=8, max_length=64,
@@ -108,42 +98,11 @@ class UserLoginSchema(BaseModel):
     password: Annotated[str, Field(..., description="password of the user")]
 
 
-# ------------------------------------------------
-# read for Client
-
-
-class UserOutForClientSchema(BaseModel):
-    id: Annotated[int, Field(..., description="Unique ID of the user")]
-    username: Annotated[str, Field(..., description="Username")]
+class UserOutSchema(BaseModel):
+    ID: int
+    username: str
 
     model_config = ConfigDict(from_attributes=True)
-
-
-# ------------------------------------------------
-# read for Admin
-
-
-class UserListForAdminSchema(BaseModel):
-    id: Annotated[int, Field(..., description="Unique ID of the user")]
-    username: Annotated[str, Field(..., description="Username")]
-    is_active: Annotated[bool, Field(
-        ..., description="user's activation: active(true)/suspend(false)"
-    )]
-    is_superuser: Annotated[bool, Field(
-        ..., description="superuser-permission for a user (true/false)"
-    )]
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class UserDetailsForAdminSchema(UserListForAdminSchema):
-    email: Annotated[EmailStr, Field(..., description="Email address")]
-    created_at: Annotated[datetime, Field(
-        ..., description="Creation timestamp"
-    )]
-    updated_at: Annotated[datetime, Field(
-        ..., description="Last update timestamp"
-    )]
 
 
 # --------------------------------------------------------------------
@@ -159,6 +118,6 @@ class FollowOrUnfollowSchema(BaseModel):
 
 
 class FollowerOrFollowingListSchema(BaseModel):
-    users_list: Annotated[Optional[list[UserOutForClientSchema]], Field(
+    users_list: Annotated[Optional[list[UserOutSchema]], Field(
         None, description="list of followers or followings"
     )]

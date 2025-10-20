@@ -1,16 +1,12 @@
 """ Schemas (Pydantic models) for 'Profile' & 'Link' Models """
 
 from typing import Annotated, Optional
-from datetime import datetime, date
+from datetime import date
 
 from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 
 from src.models import Gender
-from .user_sch import (
-    UserOutForClientSchema,
-    UserListForAdminSchema,
-    UserDetailsForAdminSchema
-)
+from .user_sch import UserOutSchema
 
 # ----------------------------------------------------------
 # Link Schemas (part of Profile)
@@ -87,15 +83,11 @@ class UpdateProfileSchema(_BaseProfileSchema):
     pass
 
 
-# ------------------------------------------------
-# read for Client
-
-
-class ProfileListForClientSchema(BaseModel):
+class ProfileListSchema(BaseModel):
     """ NOTE: this schema includes field from both User and Profile models """
     user_id: Annotated[int, Field(..., description="PK of profile (User ID)")]
     display_name: Optional[str] = None
-    user: Annotated[UserOutForClientSchema, Field(
+    user: Annotated[UserOutSchema, Field(
         ..., description="Contains 'username' and 'id' of User model"
     )]
     # profile_photo
@@ -103,7 +95,7 @@ class ProfileListForClientSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ProfileDetailsForClientSchema(ProfileListForClientSchema):
+class ProfileDetailsSchema(ProfileListSchema):
     """ NOTE: this schema includes field from both User and Profile models """
     about: Optional[str] = None
     birth_date: Optional[date] = None
@@ -129,46 +121,3 @@ class ProfileDetailsForClientSchema(ProfileListForClientSchema):
 
 # ToDo: add this later
 # class Me...  # current user's own profile
-
-# ------------------------------------------------
-# read for Admin
-
-
-class ProfileListForAdminPanelSchema(BaseModel):
-    """ NOTE: this schema includes field from both User and Profile models """
-    user_id: Annotated[int, Field(..., description="PK of profile (User ID)")]
-    display_name: Optional[str] = None
-    created_at: Annotated[datetime, Field(
-        ..., description="creation date and time (timestamp)"
-    )]
-    gender: Gender
-    user: Annotated[UserListForAdminSchema, Field(
-        ...,
-        description="Contains username, id, is_active & is_superuser of User"
-    )]
-
-    model_config = ConfigDict(from_attributes=True)
-
-
-class ProfileDetailsForAdminPanelSchema(ProfileListForAdminPanelSchema):
-    """ NOTE: this schema includes field from both User and Profile models """
-    about: Optional[str] = None
-    updated_at: datetime  # Profile.updated_at
-    birth_date: Optional[date] = None
-    links: Annotated[Optional[list[LinkListSchema]], Field(
-        None, description="list of profile's links (if there is any)"
-    )]
-
-    # NOTE: overriding 'user' from ProfileListForAdminPanelSchema
-    user: Annotated[UserDetailsForAdminSchema, Field(
-        ...,
-        description="Contains username, id, is_active, is_superuser, email,"
-                    "created_at & updated_at of User model"
-    )]
-
-    # follower_count: int
-    # following_count: int
-    # 'posts'
-    # 'comments' ???
-
-    # profile_photo

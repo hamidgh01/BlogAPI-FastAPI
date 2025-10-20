@@ -1,13 +1,10 @@
 from .user_sch import (
     CreateUserSchema,
     UpdateUserSchema,
-    UpdateUserForAdminSchema,
     UpdatePasswordSchema,
     SetNewPassword,
     UserLoginSchema,
-    UserOutForClientSchema,
-    UserListForAdminSchema,
-    UserDetailsForAdminSchema,
+    UserOutSchema,
     FollowOrUnfollowSchema,
     FollowerOrFollowingListSchema,
 )
@@ -21,17 +18,11 @@ from .post_sch import (
     PostDetailsSchema,
     LikeUnlikePostSchema
 )
-from .ticket_sch import (
-    CreateTicketSchema,
-    UpdateTicketStatusForAdminSchema,
-    TicketListSchema,
-    TicketDetailsSchema
-)
+from .ticket_sch import CreateTicketSchema
 from .comment_sch import (
     CreateCommentSchema,
     UpdateCommentContentSchema,
     UpdateCommentStatusSchema,
-    CommentListSchema,
     CommentDetailsSchema
 )
 from .list_sch import (
@@ -44,11 +35,7 @@ from .list_sch import (
 )
 from .reports_sch import (
     CreateReportOnUserSchema,
-    ReportOnUserListSchema,
-    ReportOnUserDetailsSchema,
-    CreateReportOnPostSchema,
-    ReportOnPostListSchema,
-    ReportOnPostDetailsSchema
+    CreateReportOnPostSchema
 )
 from .profile_sch import (
     CreateLinkSchema,
@@ -56,10 +43,8 @@ from .profile_sch import (
     LinkListSchema,
     InitialProfileSchema,
     UpdateProfileSchema,
-    ProfileListForClientSchema,
-    ProfileDetailsForClientSchema,
-    ProfileListForAdminPanelSchema,
-    ProfileDetailsForAdminPanelSchema
+    ProfileListSchema,
+    ProfileDetailsSchema
 )
 
 
@@ -67,13 +52,10 @@ __all__ = [
     # User Schemas
     "CreateUserSchema",
     "UpdateUserSchema",
-    "UpdateUserForAdminSchema",
     "UpdatePasswordSchema",
     "SetNewPassword",
     "UserLoginSchema",
-    "UserOutForClientSchema",
-    "UserListForAdminSchema",
-    "UserDetailsForAdminSchema",
+    "UserOutSchema",
     "FollowOrUnfollowSchema",
     "FollowerOrFollowingListSchema",
     # Post & Tag Schemas
@@ -87,14 +69,10 @@ __all__ = [
     "LikeUnlikePostSchema",
     # Ticket Schemas
     "CreateTicketSchema",
-    "UpdateTicketStatusForAdminSchema",
-    "TicketListSchema",
-    "TicketDetailsSchema",
     # Comment Schemas
     "CreateCommentSchema",
     "UpdateCommentContentSchema",
     "UpdateCommentStatusSchema",
-    "CommentListSchema",
     "CommentDetailsSchema",
     # List Schemas
     "CreateListSchema",
@@ -105,19 +83,13 @@ __all__ = [
     "SaveOrUnsaveList",
     # Reports (on users and posts) Schemas
     "CreateReportOnUserSchema",
-    "ReportOnUserListSchema",
-    "ReportOnUserDetailsSchema",
     "CreateReportOnPostSchema",
-    "ReportOnPostListSchema",
-    "ReportOnPostDetailsSchema",
     # Profile & Link Schemas
     "CreateLinkSchema",
     "UpdateLinkSchema",
     "LinkListSchema",
     "InitialProfileSchema",
     "UpdateProfileSchema",
-    "ProfileListForClientSchema",
-    "ProfileDetailsForClientSchema",
-    "ProfileListForAdminPanelSchema",
-    "ProfileDetailsForAdminPanelSchema",
+    "ProfileListSchema",
+    "ProfileDetailsSchema",
 ]

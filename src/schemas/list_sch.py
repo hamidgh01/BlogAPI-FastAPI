@@ -36,12 +36,10 @@ class UpdateListSchema(BaseModel):
 
 
 class ListListSchema(BaseModel):
-    id: Annotated[int, Field(..., description="Unique ID")]
-    title: Annotated[str, Field(..., description="Title")]
-    is_private: Annotated[bool, Field(..., description="Privacy status")]
-    created_at: Annotated[datetime, Field(
-        ..., description="creation date and time (timestamp)"
-    )]
+    ID: int
+    title: str
+    is_private: bool
+    created_at: datetime
     user_id: Annotated[int, Field(..., description="Owner user ID")]
     post_count: int
     saved_by_viewer: Annotated[bool, Field(
@@ -54,12 +52,7 @@ class ListListSchema(BaseModel):
 
 
 class ListDetailsSchema(ListListSchema):
-    description: Annotated[Optional[str], Field(
-        None, max_length=1000, description="List description"
-    )]
-
-
-# DeleteList...
+    description: Optional[str] = None
 
 
 # --------------------------------------------------------------------

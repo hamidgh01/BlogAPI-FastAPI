@@ -44,19 +44,16 @@ class UpdateCommentStatusSchema(BaseModel):
     )]
 
 
-class CommentListSchema(BaseModel):  # is used is in admin-panel
-    id: Annotated[int, Field(..., description="Unique Comment ID")]
-    user_id: Annotated[int, Field(..., description="Commenter user ID")]
-    content: Annotated[str, Field(
-        ..., description="Comment content (truncated)"
-    )]
+class CommentDetailsSchema(BaseModel):
+    ID: int
+    user_id: int
+    content: str
     status: Annotated[CommentStatus, Field(
         ..., description="Comment status enum: "
                          "published / Hidden-by-Admin / Deleted-By-Commenter"
     )]
-    created_at: Annotated[datetime, Field(
-        ..., description="Creation timestamp"
-    )]
+    created_at: datetime
+    updated_at: datetime
     parent_type: Annotated[ParentType, Field(
         ..., description="specifies parent-type (can be 'post' or 'comment')"
     )]
@@ -65,12 +62,3 @@ class CommentListSchema(BaseModel):  # is used is in admin-panel
     )]
 
     model_config = ConfigDict(from_attributes=True)
-
-
-class CommentDetailsSchema(CommentListSchema):
-    content: Annotated[str, Field(
-        ..., min_length=1, max_length=1000, description="Comment content"
-    )]
-    updated_at: Annotated[datetime, Field(
-        ..., description="Last update timestamp"
-    )]

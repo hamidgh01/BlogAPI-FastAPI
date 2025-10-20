@@ -7,7 +7,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, field_validator, ConfigDict
 
 from src.models import PostStatus
-from .user_sch import UserOutForClientSchema
+from .user_sch import UserOutSchema
 
 
 TAG_NAME_PATTERN = compile(r"^[ا-یa-z0-9_]{1,120}$")
@@ -110,14 +110,14 @@ class UpdatePostStatusSchema(BaseModel):
 
 
 class ReadTagSchema(BaseModel):  # for both 'tag_list' and 'tag_details'
-    id: Annotated[int, Field(..., description="unique tag ID")]
+    ID: Annotated[int, Field(..., description="unique tag ID")]
     name: Annotated[str, Field(..., description="unique tag name")]
 
     model_config = ConfigDict(from_attributes=True)
 
 
 class PostListSchema(BaseModel):
-    id: int
+    ID: int
     title: str
     slug: Optional[str] = None
     reading_time: Annotated[Optional[int], Field(
@@ -126,7 +126,7 @@ class PostListSchema(BaseModel):
     created_at: datetime
     published_at: Optional[datetime] = None
 
-    user: Annotated[UserOutForClientSchema, Field(
+    user: Annotated[UserOutSchema, Field(
         ..., description="Contains 'username' and 'id' of related user"
     )]
 
