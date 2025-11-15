@@ -80,6 +80,10 @@ class InitialProfileSchema(_BaseProfileSchema):
 
 class UpdateProfileSchema(_BaseProfileSchema):
     # All fields optional for partial updates
+    # gender: Annotated[Optional[Gender], Field(
+    #     None,
+    #     description="Gender enum (male / female / other / not-specified)"
+    # )]
     pass
 
 

@@ -2,7 +2,7 @@
 
 from .base import Base
 from .user import User
-from .profile import Profile, Gender
+from .profile import Link, Profile, Gender
 from .post import Post, PostStatus
 from .tag import Tag, posts_tags
 from .comment import Comment, CommentStatus
@@ -18,6 +18,7 @@ __all__ = [
     "Base",
     "User",
     "Profile",
+    "Link",
     "Post",
     "Comment",
     "Tag",

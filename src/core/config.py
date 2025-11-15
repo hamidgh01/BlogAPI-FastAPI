@@ -40,6 +40,11 @@ class Settings(BaseSettings):
         )
         return PostgresDsn(url)
 
+    # Redis:
+    REDIS_URL: str
+    MAX_CONNECTIONS_PER_PROCESS: int = 100
+    TCP_CONNECTION_ESTABLISHMENT_TIMEOUT: int = 3
+
     # JWT settings:
     # ...
 
