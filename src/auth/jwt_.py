@@ -8,6 +8,7 @@ from redis.asyncio import Redis
 
 from src.core.config import settings
 from .exceptions import JWTDecodeError, TokenError
+from .token_revocation import TokenRevocation
 
 
 class JWTHandler:
@@ -104,10 +105,10 @@ class JWTHandler:
             token_type = payload.get("type")
             if token_type != type_must_be:
                 raise TokenError("invalid token type.")
-            # ---------------------------------------------------
             # check token is blacklisted or not:
-            # ToDo: use redis blacklist tokens and check if it is blacklisted
-            # ---------------------------------------------------
+            jti = payload.get("jti")
+            if TokenRevocation.is_token_blacklisted(jti, redis):
+                raise TokenError("token revoked.")
 
             return payload
 
