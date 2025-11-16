@@ -46,7 +46,10 @@ class Settings(BaseSettings):
     TCP_CONNECTION_ESTABLISHMENT_TIMEOUT: int = 3
 
     # JWT settings:
-    # ...
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    REFRESH_TOKEN_EXPIRE_MINUTES: int = 21600  # 15 days (15 * 24 * 60 = 21600)
 
 
 settings = Settings()
