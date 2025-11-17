@@ -7,7 +7,7 @@ from jwt.exceptions import PyJWTError
 from redis.asyncio import Redis
 
 from src.core.config import settings
-from .exceptions import JWTDecodeError, TokenError
+from ._exceptions import JWTDecodeError, TokenError
 from .token_revocation import TokenRevocation
 
 
