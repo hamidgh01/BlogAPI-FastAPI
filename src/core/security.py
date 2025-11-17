@@ -1,9 +1,37 @@
 """
 security utils:
+    - JWTBearer
     - PasswordHandler
+
+(each one explained in its docstring)
 """
 
+from fastapi import Request
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from passlib.context import CryptContext
+
+from .exceptions import UnauthorizedException
+
+
+class JWTBearer(HTTPBearer):
+    """
+    Override HTTPBearer:
+    -> raise HTTP_401_UNAUTHORIZED instead of HTTP_403_FORBIDDEN
+    """
+
+    def __init__(self, **kwargs):
+        super().__init__(auto_error=False, **kwargs)
+
+    async def __call__(self, request: Request) -> HTTPAuthorizationCredentials:
+        credentials = await super().__call__(request)
+        # WHETHER : if not (authorization and scheme and credentials):
+        # OR      : if credentials.scheme.lower() != "bearer":
+        #           ---> credentials will be 'None' due to "auto_error=False"
+        if credentials is None:
+            raise UnauthorizedException(
+                "Authentication failed: Credentials is not provided properly."
+            )
+        return credentials
 
 
 class PasswordHandler:
@@ -30,3 +58,6 @@ class PasswordHandler:
             plain_password,
             hashed_password
         )
+
+
+jwt_bearer = JWTBearer()  # Customized HTTPBearer
