@@ -39,10 +39,10 @@ class JWTHandler:
                 )
 
     @staticmethod
-    def get_token_payload(
+    async def get_token_payload(
         token: str, token_type: Literal["access", "refresh"], redis: Redis
     ) -> dict[str, Any]:
-        payload = JWTHandler._decode(token, token_type, redis)
+        payload = await JWTHandler._decode(token, token_type, redis)
         return payload
 
     @staticmethod
@@ -75,7 +75,7 @@ class JWTHandler:
         return jwt.encode(payload, JWTHandler.SECRET_KEY, JWTHandler.ALGORITHM)
 
     @staticmethod
-    def _decode(
+    async def _decode(
         token: str,
         type_must_be: Literal["access", "refresh"],
         redis: Redis
@@ -107,7 +107,7 @@ class JWTHandler:
                 raise TokenError("invalid token type.")
             # check token is blacklisted or not:
             jti = payload.get("jti")
-            if TokenRevocation.is_token_blacklisted(jti, redis):
+            if await TokenRevocation.is_token_blacklisted(jti, redis):
                 raise TokenError("token revoked.")
 
             return payload

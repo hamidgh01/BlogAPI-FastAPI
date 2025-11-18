@@ -51,15 +51,6 @@ class _CheckUsernamePatternValidatorMixin:
         return value
 
 
-class _BaseUpdateUserSchema(BaseModel, _CheckUsernamePatternValidatorMixin):
-    username: Annotated[Optional[str], Field(
-        None, min_length=3, max_length=64,
-        description="Update username: Unique / only: 'a-z' , '0-9' , '_'"
-    )]
-    email: Annotated[Optional[EmailStr], Field(
-        None, description="Update email: Unique and valid email address"
-    )]
-
 # --------------------------------------------------------------------
 
 
@@ -76,8 +67,14 @@ class CreateUserSchema(
     )]
 
 
-class UpdateUserSchema(_BaseUpdateUserSchema):
-    pass
+class UpdateUserSchema(BaseModel, _CheckUsernamePatternValidatorMixin):
+    username: Annotated[Optional[str], Field(
+        None, min_length=3, max_length=64,
+        description="Update username: Unique / only: 'a-z' , '0-9' , '_'"
+    )]
+    email: Annotated[Optional[EmailStr], Field(
+        None, description="Update email: Unique and valid email address"
+    )]
 
 
 class UpdatePasswordSchema(_SetPasswordOperationSchema):
@@ -87,7 +84,7 @@ class UpdatePasswordSchema(_SetPasswordOperationSchema):
     )]
 
 
-class SetNewPassword(_SetPasswordOperationSchema):
+class SetPasswordSchema(_SetPasswordOperationSchema):
     pass  # it's used for password reset by email
 
 

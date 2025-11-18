@@ -6,7 +6,7 @@ from src.schemas import (
     CreateUserSchema,
     UpdateUserSchema,
     UpdatePasswordSchema,
-    # SetNewPassword,  Doesn't need to be tested
+    # SetPasswordSchema,  Doesn't need to be tested
     UserLoginSchema,
     UserOutSchema,
     FollowOrUnfollowSchema,
