@@ -78,7 +78,10 @@ class Comment(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     )
     # Self-referencing relationship
     parent: Mapped[Self] = relationship(
-        "Comment", remote_side="ID", backref="replies"
+        "Comment",
+        remote_side="Comment.ID",
+        foreign_keys=[comment_parent_id],
+        backref="replies"
     )
     # NOTE:
     # Comment.parent -> Self (if parent is a Comment)

@@ -100,13 +100,17 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         "Ticket", backref="sender"
     )
     # ------------------------------------------------------
-    # 1:N with ReportOnUser (as reporter)
+    # 1:N with ReportOnUser (as reporter -reports this user created-)
     reports_on_users: Mapped[list[ReportOnUser]] = relationship(
-        "ReportOnUser", backref="reporter"
+        "ReportOnUser",
+        foreign_keys='ReportOnUser.reporter_id',  # which FK to use
+        backref="reporter",
     )
-    # 1:N with ReportOnUser (as reported_user)
+    # 1:N with ReportOnUser (as reported_user -reports made against this user-)
     received_reports: Mapped[list[ReportOnUser]] = relationship(
-        "ReportOnUser", backref="reported_user"
+        "ReportOnUser",
+        foreign_keys='ReportOnUser.reported_user_id',  # which FK to use
+        backref="reported_user"
     )
     # ---------------------------------------
     # 1:N with ReportOnPost (as reporter)
