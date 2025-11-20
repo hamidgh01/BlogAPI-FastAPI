@@ -85,7 +85,7 @@ class UpdatePasswordSchema(_SetPasswordOperationSchema):
 
 
 class SetPasswordSchema(_SetPasswordOperationSchema):
-    pass  # it's used for password reset by email
+    pass
 
 
 class UserLoginSchema(BaseModel):
