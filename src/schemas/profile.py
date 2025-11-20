@@ -12,7 +12,7 @@ from .user import UserOutSchema
 # Link Schemas (part of Profile)
 
 
-class _BaseLinkSchema(BaseModel):
+class CreateLinkSchema(BaseModel):
     title: Annotated[str, Field(..., max_length=64, description="Link title")]
     url: Annotated[HttpUrl, Field(
         ..., description="Valid URL (scheme: 'http://' or 'https://')"
@@ -20,10 +20,6 @@ class _BaseLinkSchema(BaseModel):
     profile_id: Annotated[int, Field(
         ..., description="related profile pk (profile.user_id)"
     )]
-
-
-class CreateLinkSchema(_BaseLinkSchema):
-    pass
 
 
 class UpdateLinkSchema(BaseModel):
@@ -40,10 +36,7 @@ class UpdateLinkSchema(BaseModel):
     # if link_owner_id == id from auth-token
 
 
-# DeleteLinkSchema
-
-
-class LinkListSchema(_BaseLinkSchema):
+class LinkListSchema(CreateLinkSchema):
     ID: Annotated[int, Field(..., description="Unique link ID")]
     model_config = ConfigDict(from_attributes=True)
 
@@ -62,29 +55,28 @@ class _BaseProfileSchema(BaseModel):
     birth_date: Annotated[Optional[date], Field(
         None, description="Birth date (optional)"
     )]
-    gender: Annotated[Gender, Field(
-        default=Gender.NS,
-        description="Gender enum (male / female / other / not-specified)"
-    )]
+    # gender: Annotated[Gender, Field(
+    #     default=Gender.NS,
+    #     description="Gender enum (male / female / other / not-specified)"
+    # )]
     # profile_photo
 
 
-class InitialProfileSchema(_BaseProfileSchema):
-    """
-    Since Profile is 1:1 with User, create-profile is tied to user creation.
-    after creating user (and then profile object using 'user_id'):
-    as the next step: user can fill out profile fields (separated request)
-    """
-    pass
+# class InitialProfileSchema(_BaseProfileSchema):
+#     """
+#     Since Profile is 1:1 with User, create-profile is tied to user creation.
+#     after creating user (and then profile object using 'user_id'):
+#     as the next step: user can fill out profile fields (separated request)
+#     """
+#     pass
 
 
 class UpdateProfileSchema(_BaseProfileSchema):
     # All fields optional for partial updates
-    # gender: Annotated[Optional[Gender], Field(
-    #     None,
-    #     description="Gender enum (male / female / other / not-specified)"
-    # )]
-    pass
+    gender: Annotated[Optional[Gender], Field(
+        None,
+        description="Gender enum (male / female / other / not-specified)"
+    )]
 
 
 class ProfileListSchema(BaseModel):

@@ -73,7 +73,8 @@ def test_healthiness_of_update_profile_schema():
     assert sch1.display_name is None
     assert sch1.about is None
     assert sch1.birth_date is None
-    assert sch1.gender.name == "NS" and sch1.gender.value == "not-specified"
+    # assert sch1.gender.name == "NS" and sch1.gender.value == "not-specified"
+    assert sch1.gender is None
     sch2 = UpdateProfileSchema(
         display_name="nobody at nowhere",
         about="a long text as bio or about me\n" * 10,
