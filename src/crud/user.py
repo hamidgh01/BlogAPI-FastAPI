@@ -9,10 +9,7 @@ from sqlalchemy.exc import (
 from src.models import User
 from src.core.security import PasswordHandler
 from src.core.exceptions import (
-    InternalServerError,
-    NotFoundException,
-    BadRequestException,
-    UnauthorizedException
+    InternalServerError, NotFoundException, BadRequestException
 )
 from ._exceptions import DuplicateValueException
 
@@ -24,7 +21,7 @@ if TYPE_CHECKING:
         CreateUserSchema,
         UpdateUserSchema,
         SetPasswordSchema,
-        UserLoginSchema,
+        UserLoginRequestSchema,
     )
 
 
@@ -102,21 +99,22 @@ class UserCrud:
             raise InternalServerError(msg) from err
 
     @staticmethod
-    async def verify_password(data: UserLoginSchema, db: AsyncSession) -> User:
+    async def verify_user_for_login(
+        data: UserLoginRequestSchema, db: AsyncSession
+    ) -> User | None:
         query = select(User).where(or_(
             User.username == data.identifier, User.email == data.identifier
         ))  # NOTE: data.identifier is whether `username` or `email`
         result = await db.execute(query)
-        user: Optional[User] = result.scalars().one_or_none()
-
+        user: Optional[User] = result.scalar_one_or_none()
         if user is None:
-            raise UnauthorizedException("Invalid username, email or password")
+            return
 
         is_password_verified = PasswordHandler.verify_password(
             plain_password=data.password, hashed_password=user.password
         )
         if not is_password_verified:
-            raise UnauthorizedException("Invalid username, email or password")
+            return
 
         return user
 

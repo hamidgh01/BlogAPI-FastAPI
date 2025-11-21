@@ -6,7 +6,7 @@ from redis.asyncio import Redis
 class TokenRevocation:
     """
     Handle Token-Revocation strategy:
-    revoke/blacklist non-expired tokens that should be useable anymore.
+    revoke/blacklist non-expired tokens that shouldn't be useable anymore.
     (for example: when a user logs out, or get new-tokens using `renew_tokens`
     endpoint, its token in browser's cookie or frontend-app temp-memory
     will be deleted too; but the token itself is not expired and it can
@@ -22,7 +22,7 @@ class TokenRevocation:
     KEY_PREFIX = "jwt-bl:"  # blacklist-tokens prefix
 
     @staticmethod
-    async def put_in_blacklist(payload: dict, redis: Redis):
+    async def put_in_blacklist(payload: dict, redis: Redis) -> None:
         """
         params:
             - `payload` : extracted payload of the token to blacklist

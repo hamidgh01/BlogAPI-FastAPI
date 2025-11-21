@@ -3,8 +3,9 @@ from .user import (
     UpdateUserSchema,
     UpdatePasswordSchema,
     SetPasswordSchema,
-    UserLoginSchema,
     UserOutSchema,
+    UserLoginRequestSchema,
+    LoginSuccessfulData,
     FollowOrUnfollowSchema,
     FollowerOrFollowingListSchema,
 )
@@ -54,8 +55,9 @@ __all__ = [
     "UpdateUserSchema",
     "UpdatePasswordSchema",
     "SetPasswordSchema",
-    "UserLoginSchema",
     "UserOutSchema",
+    "UserLoginRequestSchema",
+    "LoginSuccessfulData",
     "FollowOrUnfollowSchema",
     "FollowerOrFollowingListSchema",
     # Post & Tag Schemas

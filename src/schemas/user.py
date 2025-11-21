@@ -88,16 +88,23 @@ class SetPasswordSchema(_SetPasswordOperationSchema):
     pass
 
 
-class UserLoginSchema(BaseModel):
+class UserOutSchema(BaseModel):
+    ID: int
+    username: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class UserLoginRequestSchema(BaseModel):
     identifier: Annotated[str, Field(
         ..., description="can be 'username' or 'email' of the User"
     )]
     password: Annotated[str, Field(..., description="password of the user")]
 
 
-class UserOutSchema(BaseModel):
-    ID: int
-    username: str
+class LoginSuccessfulData(BaseModel):
+    user: UserOutSchema
+    access_token: str
 
     model_config = ConfigDict(from_attributes=True)
 

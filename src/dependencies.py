@@ -1,11 +1,11 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, AsyncGenerator, Annotated
 
-from fastapi import Depends
+from fastapi import Depends, Request
 
 from src.core.database import AsyncSessionLocal
 from src.core.security import jwt_bearer
-from src.auth.jwt_ import JWTHandler
+from src.auth import JWTHandler
 from src.crud.user import UserCrud
 from src.core.exceptions import (
     NotFoundException, UnauthorizedException, ForbiddenException
@@ -13,7 +13,6 @@ from src.core.exceptions import (
 
 if TYPE_CHECKING:
     from fastapi.security import HTTPAuthorizationCredentials
-    from fastapi import Request
     from redis.asyncio import Redis
     from sqlalchemy.ext.asyncio import AsyncSession
 

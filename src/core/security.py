@@ -29,7 +29,7 @@ class JWTBearer(HTTPBearer):
         #           ---> credentials will be 'None' due to "auto_error=False"
         if credentials is None:
             raise UnauthorizedException(
-                "Authentication failed: Credentials is not provided properly."
+                "Authentication failed: Invalid Credentials."
             )
         return credentials
 
