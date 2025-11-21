@@ -7,8 +7,9 @@ from src.schemas import (
     UpdateUserSchema,
     UpdatePasswordSchema,
     # SetPasswordSchema,  Doesn't need to be tested
-    UserLoginSchema,
     UserOutSchema,
+    UserLoginRequestSchema,
+    LoginSuccessfulData,
     FollowOrUnfollowSchema,
     FollowerOrFollowingListSchema
 )
@@ -138,22 +139,33 @@ def test_healthiness_of_update_password_schema():
     assert user_pass_schema.password == "abcde12345"
 
 
-def test_healthiness_of_user_login_schema():
-    """ test successful validation and serialization in UserLoginSchema() """
+def test_healthiness_of_user_login_request_schema():
+    """
+    test successful validation and serialization in UserLoginRequestSchema()
+    """
 
-    sch1 = UserLoginSchema(identifier="hamid01", password="7686453452")
-    sch2 = UserLoginSchema(identifier="hamid@example.com", password="test1234")
+    sch1 = UserLoginRequestSchema(identifier="hamid01", password="7686453452")
+    sch2 = UserLoginRequestSchema(
+        identifier="hamid@example.com", password="test1234"
+    )
     assert type(sch1.password) is str
     assert sch1.identifier == "hamid01"
     assert sch2.identifier == "hamid@example.com"
 
 
-def test_healthiness_of_user_out_schema():
-    """ test successful validation and serialization in UserOutSchema() """
+def test_healthiness_of_login_successful_data_and_user_out_schema():
+    """ test successful validation and serialization
+    in LoginSuccessfulData() and UserOutSchema() """
 
-    sch = UserOutSchema(ID=12345, username="hamid01")
-    assert type(sch.ID) is int and sch.ID == 12345
-    assert sch.username == "hamid01"
+    user_out_sch = UserOutSchema(ID=12345, username="hamid01")
+    ls_data_sch = LoginSuccessfulData(
+        user=user_out_sch, access_token="SDsdajtioejdfzkj"
+    )
+    assert type(ls_data_sch.user) is UserOutSchema
+    assert type(ls_data_sch.user.ID) is int and ls_data_sch.user.ID == 12345
+    assert ls_data_sch.user.username == "hamid01"
+    assert type(ls_data_sch.access_token) is str
+    assert ls_data_sch.access_token == "SDsdajtioejdfzkj"
 
 
 def test_healthiness_of_user_details_for_admin_schema():
