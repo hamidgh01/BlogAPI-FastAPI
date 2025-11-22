@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field, ConfigDict
 
 from src.models import Gender
 from .user import UserListSchema, UserDetailsForAdminSchema
-from ..profile import LinkListSchema
+from ..profile import LinkOut
 
 
 class ProfileListForAdminPanelSchema(BaseModel):
@@ -29,7 +29,7 @@ class ProfileDetailsForAdminPanelSchema(ProfileListForAdminPanelSchema):
     about: Optional[str] = None
     updated_at: datetime  # Profile.updated_at
     birth_date: Optional[date] = None
-    links: Annotated[Optional[list[LinkListSchema]], Field(
+    links: Annotated[Optional[list[LinkOut]], Field(
         None, description="list of profile's links (if there is any)"
     )]
 

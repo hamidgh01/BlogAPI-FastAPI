@@ -18,6 +18,7 @@ from src.schemas.admin import (
     # UserListSchema,
     UserDetailsForAdminSchema  # includes all fields in UserListSchema
 )
+from src.schemas.GENERAL import Token, Message
 
 # NOTE: repeated functionalities and validation in different Schemas
 # is tested just for one time!
@@ -153,19 +154,18 @@ def test_healthiness_of_user_login_request_schema():
     assert sch2.identifier == "hamid@example.com"
 
 
-def test_healthiness_of_login_successful_data_and_user_out_schema():
+def test_healthiness_of_login_successful_data_and_token_and_user_out_schema():
     """ test successful validation and serialization
-    in LoginSuccessfulData() and UserOutSchema() """
+    in LoginSuccessfulData() and UserOutSchema() and Token() """
 
     user_out_sch = UserOutSchema(ID=12345, username="hamid01")
-    ls_data_sch = LoginSuccessfulData(
-        user=user_out_sch, access_token="SDsdajtioejdfzkj"
-    )
+    token = Token(access_token="SDsdajtioejdfzkj")
+    ls_data_sch = LoginSuccessfulData(user=user_out_sch, token=token)
     assert type(ls_data_sch.user) is UserOutSchema
     assert type(ls_data_sch.user.ID) is int and ls_data_sch.user.ID == 12345
     assert ls_data_sch.user.username == "hamid01"
-    assert type(ls_data_sch.access_token) is str
-    assert ls_data_sch.access_token == "SDsdajtioejdfzkj"
+    assert type(ls_data_sch.token.access_token) is str
+    assert ls_data_sch.token.access_token == "SDsdajtioejdfzkj"
 
 
 def test_healthiness_of_user_details_for_admin_schema():
@@ -213,3 +213,12 @@ def test_healthiness_of_follower_or_following_list_schema():
     assert len(sch3.users_list) > 1
     assert sch3.users_list[1].ID == 1655
     assert sch3.users_list[1].username == "nobody"
+
+
+# ----------------------------
+
+
+def test_healthiness_of_message_schema():
+    """ test successful validation and serialization in Message() """
+    msg = Message(message="Hello World")
+    assert type(msg.message) is str and msg.message == "Hello World"

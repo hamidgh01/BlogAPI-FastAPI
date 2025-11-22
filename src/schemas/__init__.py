@@ -41,12 +41,14 @@ from .reports import (
 from .profile import (
     CreateLinkSchema,
     UpdateLinkSchema,
-    LinkListSchema,
+    LinkOut,
     # InitialProfileSchema,
     UpdateProfileSchema,
     ProfileListSchema,
+    ProfileOutAfterUpdate,
     ProfileDetailsSchema
 )
+from .GENERAL import Message, Token
 
 
 __all__ = [
@@ -89,9 +91,13 @@ __all__ = [
     # Profile & Link Schemas
     "CreateLinkSchema",
     "UpdateLinkSchema",
-    "LinkListSchema",
+    "LinkOut",
     # "InitialProfileSchema",
     "UpdateProfileSchema",
     "ProfileListSchema",
+    "ProfileOutAfterUpdate",
     "ProfileDetailsSchema",
+    # General schemas
+    "Message",
+    "Token",
 ]

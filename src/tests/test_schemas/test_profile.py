@@ -6,11 +6,12 @@ import pytest
 from src.schemas import (
     # CreateLinkSchema,  # Doesn't need to be tested
     UpdateLinkSchema,
-    LinkListSchema,  # includes all fields in CreateLinkSchema
+    LinkOut,  # includes all fields in CreateLinkSchema
     # InitialProfileSchema,
     UpdateProfileSchema,  # includes all fields in InitialProfileSchema
     # ProfileListSchema,
-    ProfileDetailsSchema,  # includes all fields in ProfileListSchema
+    # ProfileOutAfterUpdate,
+    ProfileDetailsSchema,  # includes all fields in both above schemas
     UserOutSchema
 )
 from src.schemas.admin import (
@@ -49,8 +50,8 @@ def test_healthiness_of_update_link_schema():
 
 
 def test_healthiness_of_link_list_schema():
-    """ test successful validation and serialization in LinkListSchema() """
-    sch = LinkListSchema(
+    """ test successful validation and serialization in LinkOut() """
+    sch = LinkOut(
         ID=8765432134,
         title="youtube",
         url="https://toplevel.example.com/path/to/details",
@@ -120,13 +121,13 @@ def test_healthiness_of_profile_details_schema():
         gender="male",
         birth_date=date(year=1988, month=6, day=29),
         links=[
-            LinkListSchema(
+            LinkOut(
                 ID=8721,
                 title="youtube",
                 url="https://youtube.com/path/to/my/channel",
                 profile_id=48
             ),
-            LinkListSchema(
+            LinkOut(
                 ID=3467,
                 title="github",
                 url="https://github.com/hamidgh01",
@@ -194,13 +195,13 @@ def test_healthiness_of_profile_details_for_admin_panel_schema():
         about="a long description ad bio or about.\n" * 4,
         birth_date=date(year=1988, month=6, day=29),
         links=[
-            LinkListSchema(
+            LinkOut(
                 ID=8721,
                 title="youtube",
                 url="https://youtube.com/path/to/my/channel",
                 profile_id=544
             ),
-            LinkListSchema(
+            LinkOut(
                 ID=3467,
                 title="github",
                 url="https://github.com/hamidgh01",

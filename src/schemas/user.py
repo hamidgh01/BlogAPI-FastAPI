@@ -5,6 +5,8 @@ from re import fullmatch
 
 from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict
 
+from .GENERAL import Token
+
 # --------------------------------------------------------------------
 # Bases & Mixins:
 
@@ -104,7 +106,7 @@ class UserLoginRequestSchema(BaseModel):
 
 class LoginSuccessfulData(BaseModel):
     user: UserOutSchema
-    access_token: str
+    token: Token
 
     model_config = ConfigDict(from_attributes=True)
 

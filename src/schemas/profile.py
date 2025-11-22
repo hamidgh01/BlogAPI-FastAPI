@@ -36,7 +36,7 @@ class UpdateLinkSchema(BaseModel):
     # if link_owner_id == id from auth-token
 
 
-class LinkListSchema(CreateLinkSchema):
+class LinkOut(CreateLinkSchema):
     ID: Annotated[int, Field(..., description="Unique link ID")]
     model_config = ConfigDict(from_attributes=True)
 
@@ -91,12 +91,24 @@ class ProfileListSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ProfileDetailsSchema(ProfileListSchema):
+class ProfileOutAfterUpdate(BaseModel):
     """ NOTE: this schema includes field from both User and Profile models """
+    user_id: Annotated[int, Field(..., description="PK of profile (User ID)")]
+    display_name: Optional[str] = None
     about: Optional[str] = None
     birth_date: Optional[date] = None
     gender: Gender
-    links: Annotated[Optional[list[LinkListSchema]], Field(
+    # profile_photo
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class ProfileDetailsSchema(ProfileOutAfterUpdate):
+    """ NOTE: this schema includes field from both User and Profile models """
+    user: Annotated[UserOutSchema, Field(
+        ..., description="Contains 'username' and 'id' of User model"
+    )]
+    links: Annotated[Optional[list[LinkOut]], Field(
         None, description="list of profile's links (if there is any)"
     )]
     follower_count: int
