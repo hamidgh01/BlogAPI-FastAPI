@@ -1,22 +1,18 @@
-from __future__ import annotations
-from typing import TYPE_CHECKING, AsyncGenerator, Annotated
+from typing import AsyncGenerator, Annotated
 
 from fastapi import Depends, Request
+from fastapi.security import HTTPAuthorizationCredentials
+from sqlalchemy.ext.asyncio import AsyncSession
+from redis.asyncio import Redis
 
 from src.core.database import AsyncSessionLocal
 from src.core.security import jwt_bearer
 from src.auth import JWTHandler
+from src.models.user import User
 from src.crud.user import UserCrud
 from src.core.exceptions import (
     NotFoundException, UnauthorizedException, ForbiddenException
 )
-
-if TYPE_CHECKING:
-    from fastapi.security import HTTPAuthorizationCredentials
-    from redis.asyncio import Redis
-    from sqlalchemy.ext.asyncio import AsyncSession
-
-    from src.models.user import User
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
