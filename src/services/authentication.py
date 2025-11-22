@@ -7,6 +7,7 @@ from src.core.exceptions import UnauthorizedException
 from src.auth import JWTHandler, TokenRevocation
 from src.crud import UserCrud
 from src.schemas.user import LoginSuccessfulData, UserOutSchema
+from src.schemas.GENERAL import Token
 
 if TYPE_CHECKING:
     from fastapi import Request, Response
@@ -33,7 +34,8 @@ class AuthService:
         refresh_token = JWTHandler.generate_token(user.ID, "refresh")
 
         AuthService._add_refresh_token_cookie(response, refresh_token)
-        return LoginSuccessfulData(user=user, access_token=access_token)
+        token = Token(access_token=access_token)
+        return LoginSuccessfulData(user=user, token=token)
 
     @staticmethod
     async def logout(
@@ -58,9 +60,9 @@ class AuthService:
         response.delete_cookie("X-Auth-Token")
 
     @staticmethod
-    async def renew_both_tokens(
+    async def renew_tokens(
         request: Request, response: Response, redis: Redis
-    ) -> str:
+    ) -> Token:
         refresh_token = request.cookies.get("X-Auth-Token", None)
         if refresh_token is None:
             raise UnauthorizedException("Token Not provided.")
@@ -79,7 +81,7 @@ class AuthService:
         await TokenRevocation.put_in_blacklist(refresh_token_payload, redis)
 
         AuthService._add_refresh_token_cookie(response, new_refresh_token)
-        return new_access_token
+        return Token(access_token=new_access_token)
 
     @staticmethod
     def _add_refresh_token_cookie(response: Response, token: str) -> None:

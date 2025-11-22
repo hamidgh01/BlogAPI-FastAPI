@@ -1,7 +1,6 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 
-from src.crud import UserCrud, ProfileCrud, LinkCrud
 from src.core.security import PasswordHandler
 from src.core.exceptions import (
     InternalServerError,
@@ -9,12 +8,14 @@ from src.core.exceptions import (
     BadRequestException,
     NotFoundException
 )
-from src.schemas.user import SetPasswordSchema
+from src.crud import UserCrud, ProfileCrud, LinkCrud
+from src.schemas.user import UserOutSchema, SetPasswordSchema
+from src.schemas.profile import ProfileOutAfterUpdate, LinkOut
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
-    from src.models import User, Profile, Link
+    from src.models import User
     from src.schemas.user import (
         CreateUserSchema, UpdateUserSchema, UpdatePasswordSchema
     )
@@ -52,8 +53,9 @@ class UserService:
     @staticmethod
     async def update_user(
         current_user: User, data: UpdateUserSchema, db: AsyncSession
-    ) -> User:
-        return await UserCrud.update(current_user, data, db)
+    ) -> UserOutSchema:
+        user = await UserCrud.update(current_user, data, db)
+        return UserOutSchema(ID=user.ID, username=user.username)
 
     @staticmethod
     async def update_password(
@@ -76,29 +78,48 @@ class UserService:
     @staticmethod
     async def update_profile(
         current_user_id: int, data: UpdateProfileSchema, db: AsyncSession
-    ) -> Profile:
-        return await ProfileCrud.update(current_user_id, data, db)
+    ) -> ProfileOutAfterUpdate:
+        profile = await ProfileCrud.update(current_user_id, data, db)
+        return ProfileOutAfterUpdate(
+            user_id=profile.user_id,
+            display_name=profile.display_name,
+            about=profile.about,
+            birth_date=profile.birth_date,
+            gender=profile.gender
+        )
 
     @staticmethod
     async def add_link(
         current_user_id: int, data: list[CreateLinkSchema], db: AsyncSession
-    ) -> list[Link]:
+    ) -> list[LinkOut]:
         if not data:
             return []  # ToDo: maybe change here
         if any(link_sch.profile_id != current_user_id for link_sch in data):
             raise ForbiddenException("Operation is not allowed!")
-        return await LinkCrud.create(data, db)
+        links = await LinkCrud.create(data, db)
+        return [LinkOut(
+            ID=updated_link.profile_id,
+            title=updated_link.title,
+            url=updated_link.url,
+            profile_id=updated_link.profile_id
+        ) for updated_link in links]
 
     @staticmethod
     async def update_link(
         current_user_id: int, pk: int, data: UpdateLinkSchema, db: AsyncSession
-    ) -> Link:
+    ) -> LinkOut:
         updated_link = await LinkCrud.update(current_user_id, pk, data, db)
         if updated_link is None:
             raise NotFoundException(
                 f"Requester(pk='{current_user_id}') is not owner of "
                 f"any Link with pk='{pk}'"
             )
+        return LinkOut(
+            ID=updated_link.profile_id,
+            title=updated_link.title,
+            url=updated_link.url,
+            profile_id=updated_link.profile_id
+        )
 
     @staticmethod
     async def delete_link(
