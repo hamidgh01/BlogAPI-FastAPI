@@ -23,11 +23,29 @@ class AuthService:
 
     @staticmethod
     async def login(
-        response: Response, data: UserLoginRequestSchema, db: AsyncSession
+        request: Request,
+        response: Response,
+        data: UserLoginRequestSchema,
+        redis: Redis,
+        db: AsyncSession
     ) -> LoginSuccessfulData:
+        # first: check if user already logged-in
+        refresh_token = request.cookies.get("X-Auth-Token", None)
+        if refresh_token is not None:
+            try:
+                payload = await JWTHandler.get_token_payload(
+                    refresh_token, "refresh", redis
+                )
+                await TokenRevocation.put_in_blacklist(payload, redis)
+                # don't need to delete X-Auth-Token cookie, it'll be overridden
+            except UnauthenticatedException:
+                pass
+
         user = await UserCrud.verify_user_for_login(data, db)
         if user is None:
-            raise UnauthenticatedException("Invalid username, email or password")
+            raise UnauthenticatedException(
+                "Invalid username, email or password"
+            )
 
         user = UserOutSchema(ID=user.ID, username=user.username)
         access_token = JWTHandler.generate_token(user.ID, "access")

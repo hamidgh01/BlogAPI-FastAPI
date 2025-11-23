@@ -98,7 +98,7 @@ class UserService:
             raise ForbiddenException("Operation is not allowed!")
         links = await LinkCrud.create(data, db)
         return [LinkOut(
-            ID=updated_link.profile_id,
+            ID=updated_link.ID,
             title=updated_link.title,
             url=updated_link.url,
             profile_id=updated_link.profile_id
