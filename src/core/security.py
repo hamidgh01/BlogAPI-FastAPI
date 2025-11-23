@@ -10,7 +10,7 @@ from fastapi import Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from passlib.context import CryptContext
 
-from .exceptions import UnauthorizedException
+from .exceptions import UnauthenticatedException
 
 
 class JWTBearer(HTTPBearer):
@@ -28,7 +28,7 @@ class JWTBearer(HTTPBearer):
         # OR      : if credentials.scheme.lower() != "bearer":
         #           ---> credentials will be 'None' due to "auto_error=False"
         if credentials is None:
-            raise UnauthorizedException(
+            raise UnauthenticatedException(
                 "Authentication failed: Invalid Credentials."
             )
         return credentials

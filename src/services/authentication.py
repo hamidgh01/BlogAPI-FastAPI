@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from datetime import datetime, timezone, timedelta
 
 from src.core.config import settings
-from src.core.exceptions import UnauthorizedException
+from src.core.exceptions import UnauthenticatedException
 from src.auth import JWTHandler, TokenRevocation
 from src.crud import UserCrud
 from src.schemas.user import LoginSuccessfulData, UserOutSchema
@@ -27,7 +27,7 @@ class AuthService:
     ) -> LoginSuccessfulData:
         user = await UserCrud.verify_user_for_login(data, db)
         if user is None:
-            raise UnauthorizedException("Invalid username, email or password")
+            raise UnauthenticatedException("Invalid username, email or password")
 
         user = UserOutSchema(ID=user.ID, username=user.username)
         access_token = JWTHandler.generate_token(user.ID, "access")
@@ -47,7 +47,7 @@ class AuthService:
         access_token = credentials.credentials
         refresh_token = request.cookies.get("X-Auth-Token", None)
         if refresh_token is None:
-            raise UnauthorizedException("Token Not provided.")
+            raise UnauthenticatedException("Token Not provided.")
 
         refresh_token_payload = await JWTHandler.get_token_payload(
             refresh_token, "refresh", redis
@@ -65,7 +65,7 @@ class AuthService:
     ) -> Token:
         refresh_token = request.cookies.get("X-Auth-Token", None)
         if refresh_token is None:
-            raise UnauthorizedException("Token Not provided.")
+            raise UnauthenticatedException("Token Not provided.")
 
         refresh_token_payload = await JWTHandler.get_token_payload(
             refresh_token, "refresh", redis

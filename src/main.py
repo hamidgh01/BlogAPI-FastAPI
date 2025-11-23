@@ -1,11 +1,10 @@
-from typing import Annotated
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import FastAPI
 
-from src.core.database import get_db
 from src.core.redis import init_redis, close_redis
+from src.core.exceptions import CustomException
+from src.utils.exception_handlers import custom_exception_handler
 
 
 @asynccontextmanager
@@ -25,10 +24,9 @@ app = FastAPI(
     swagger_ui_parameters={"syntaxHighlight.theme": "monokai"}
 )
 
+app.add_exception_handler(CustomException, custom_exception_handler)
+
 
 @app.get("/")
-async def home(db: Annotated[AsyncSession, Depends(get_db)]):
-    return "Hello world!"
-
-
-# app.include_router(...)
+async def home():
+    return "Welcome to this Blog!"

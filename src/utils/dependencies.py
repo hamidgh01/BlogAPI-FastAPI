@@ -11,7 +11,7 @@ from src.auth import JWTHandler
 from src.models.user import User
 from src.crud.user import UserCrud
 from src.core.exceptions import (
-    NotFoundException, UnauthorizedException, ForbiddenException
+    NotFoundException, UnauthenticatedException, ForbiddenException
 )
 
 
@@ -42,7 +42,7 @@ async def get_current_user_object(
         # user = ... (cache users in redis and get from redis)
         user = await UserCrud.get_by_id(user_id, db)
     except NotFoundException as err:
-        raise UnauthorizedException(err.message) from err
+        raise UnauthenticatedException(err.message) from err
 
     if not user.is_active:
         raise ForbiddenException(f"The user {user.username!r} is suspended.")

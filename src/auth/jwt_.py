@@ -3,11 +3,11 @@ import uuid
 from datetime import datetime, timezone, timedelta
 
 import jwt
-from jwt.exceptions import PyJWTError
+from jwt.exceptions import PyJWTError, ExpiredSignatureError
 from redis.asyncio import Redis
 
 from src.core.config import settings
-from ._exceptions import JWTDecodeError, TokenError
+from src.core.exceptions import UnauthenticatedException
 from .token_revocation import TokenRevocation
 
 
@@ -100,17 +100,31 @@ class JWTHandler:
             utc_now_ts = datetime.now(timezone.utc).timestamp()
             token_expire_ts = payload.get("exp", None)
             if (token_expire_ts is None) or utc_now_ts > token_expire_ts:
-                raise TokenError("token expired.")
+                raise UnauthenticatedException(
+                    "Authentication failed: token expired."
+                )
             # check token type:
             token_type = payload.get("type")
             if token_type != type_must_be:
-                raise TokenError("invalid token type.")
+                raise UnauthenticatedException(
+                    "Authentication failed: invalid token type."
+                )
             # check token is blacklisted or not:
             jti = payload.get("jti")
             if await TokenRevocation.is_token_blacklisted(jti, redis):
-                raise TokenError("token revoked.")
+                raise UnauthenticatedException(
+                    "Authentication failed: token revoked (blacklisted)."
+                )
 
             return payload
 
+        except ExpiredSignatureError as err:
+            raise UnauthenticatedException(
+                    "Authentication failed: token expired."
+                ) from err
+
         except PyJWTError as err:
-            raise JWTDecodeError(f"{err.__class__.__name__}: {err}") from err
+            raise UnauthenticatedException(
+                f"Authentication failed (unable to decode token): "
+                f"{err.__class__.__name__}: {err}"
+            ) from err

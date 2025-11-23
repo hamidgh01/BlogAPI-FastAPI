@@ -9,9 +9,11 @@ from sqlalchemy.exc import (
 from src.models import User
 from src.core.security import PasswordHandler
 from src.core.exceptions import (
-    InternalServerError, NotFoundException, BadRequestException
+    InternalServerError,
+    NotFoundException,
+    BadRequestException,
+    DuplicateValueException
 )
-from ._exceptions import DuplicateValueException
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
