@@ -15,6 +15,8 @@ from src.core.exceptions import (
     DuplicateValueException
 )
 
+from .utils import same_action_for_sqlalchemy_error
+
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
     from pydantic import EmailStr
@@ -52,10 +54,7 @@ class UserCrud:
             raise InternalServerError(msg) from err
 
         except SQLAlchemyError as err:
-            await db.rollback()
-            # ToDo: here needs to be `logged` properly
-            msg = "Failed to create `User`! unexpected database error."
-            raise InternalServerError(msg) from err
+            same_action_for_sqlalchemy_error(db, "create `User`", err)
 
     @staticmethod
     async def update(
@@ -82,10 +81,7 @@ class UserCrud:
             raise InternalServerError(msg) from err
 
         except SQLAlchemyError as err:
-            await db.rollback()
-            # ToDo: here needs to be `logged` properly
-            msg = "Failed to update `User`! Unexpected database error."
-            raise InternalServerError(msg) from err
+            same_action_for_sqlalchemy_error(db, "update `User`", err)
 
     @staticmethod
     async def set_new_password(
@@ -96,9 +92,7 @@ class UserCrud:
             user.password = new_password_hash
             await db.commit()
         except SQLAlchemyError as err:
-            await db.rollback()
-            msg = "Failed to set new password! Unexpected database error."
-            raise InternalServerError(msg) from err
+            same_action_for_sqlalchemy_error(db, "set new password", err)
 
     @staticmethod
     async def verify_user_for_login(
@@ -126,10 +120,7 @@ class UserCrud:
             await db.delete(user)
             await db.commit()
         except SQLAlchemyError as err:
-            await db.rollback()
-            # ToDo: here needs to be `logged` properly
-            msg = "Failed to delete `User`! Unexpected database error."
-            raise InternalServerError(msg) from err
+            same_action_for_sqlalchemy_error(db, "delete `User`", err)
 
     @staticmethod
     async def get_by_id(pk: int, db: AsyncSession) -> User:

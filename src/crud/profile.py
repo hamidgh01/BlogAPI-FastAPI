@@ -5,9 +5,9 @@ from sqlalchemy import insert, update, delete, and_
 from sqlalchemy.exc import SQLAlchemyError
 
 from src.models import Profile, Link
-from src.core.exceptions import (
-    InternalServerError, BadRequestException, NotFoundException
-)
+from src.core.exceptions import BadRequestException, NotFoundException
+
+from .utils import same_action_for_sqlalchemy_error
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,10 +36,7 @@ class ProfileCrud:
             # await db.refresh(profile)
             # return profile
         except SQLAlchemyError as err:
-            await db.rollback()
-            # ToDo: here needs to be `logged` properly
-            msg = "Failed to create `Profile`! unexpected database error."
-            raise InternalServerError(msg) from err
+            same_action_for_sqlalchemy_error(db, "create `Profile`", err)
 
     @staticmethod
     async def update(
@@ -57,10 +54,7 @@ class ProfileCrud:
             updated_profile: Optional[Profile] = result.scalars().one_or_none()
             # if updated_profile is None:  # ToDo: handle it later
         except SQLAlchemyError as err:
-            await db.rollback()
-            # ToDo: here needs to be `logged` properly
-            msg = "Failed to update `Profile`! Unexpected database error."
-            raise InternalServerError(msg) from err
+            same_action_for_sqlalchemy_error(db, "update `Profile`", err)
 
         return updated_profile
 
@@ -94,10 +88,7 @@ class LinkCrud:
             await db.commit()
             created_links: list[Link] = result.scalars().all()
         except SQLAlchemyError as err:
-            await db.rollback()
-            # ToDo: here needs to be `logged` properly
-            msg = "Failed to create `Links`! unexpected database error."
-            raise InternalServerError(msg) from err
+            same_action_for_sqlalchemy_error(db, "create `Links`", err)
 
         return created_links
 
@@ -110,16 +101,13 @@ class LinkCrud:
             raise BadRequestException("Empty field values to update.")
         try:
             query = update(Link).where(
-                Link.ID == pk, Link.profile_id == current_user_id
+                and_(Link.ID == pk, Link.profile_id == current_user_id)
             ).values(**data).returning(Link)
             result = await db.execute(query)
             await db.commit()
             updated_link: Optional[Link] = result.scalars().one_or_none()
         except SQLAlchemyError as err:
-            await db.rollback()
-            # ToDo: here needs to be `logged` properly
-            msg = "Failed to update `Link`! Unexpected database error."
-            raise InternalServerError(msg) from err
+            same_action_for_sqlalchemy_error(db, "update `Links`", err)
 
         return updated_link  # Link | None
 
