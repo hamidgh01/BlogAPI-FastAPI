@@ -4,26 +4,26 @@ from .base import Base
 
 
 # 'follows' association table -> M2M between 'users' and 'users'.
-# NOTE: PK here is the combination of "follower_id" and "following_id".
+# NOTE: PK here is the combination of "followed_by" and "followed".
 follows = Table(
     "follows",
     Base.metadata,
     Column(
-        "follower_id",
+        "followed_by",  # user who follows another one
         BigInteger,
         ForeignKey("users.ID", ondelete="CASCADE"),
         nullable=False,
         primary_key=True
     ),
     Column(
-        "following_id",
+        "followed",  # user who is followed
         BigInteger,
         ForeignKey("users.ID", ondelete="CASCADE"),
         nullable=False,
         primary_key=True
     ),
     Column(
-        name="followed_at",
+        name="follow_at",
         type_=DateTime,
         server_default=func.now()
     )

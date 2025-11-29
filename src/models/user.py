@@ -122,8 +122,8 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     followings: Mapped[list[Self]] = relationship(
         "User",
         secondary=follows,
-        primaryjoin=lambda: User.ID == follows.c.follower_id,
-        secondaryjoin=lambda: User.ID == follows.c.following_id,
+        primaryjoin=lambda: User.ID == follows.c.followed_by,
+        secondaryjoin=lambda: User.ID == follows.c.followed,
         backref="followers"
     )
     # N:N with Post (like-system) ('post_likes' association table)
