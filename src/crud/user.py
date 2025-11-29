@@ -1,12 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING, Literal, Optional
 
-from sqlalchemy import select, or_
+from sqlalchemy import select, delete, or_, and_, desc
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.exc import (
     IntegrityError, MultipleResultsFound, SQLAlchemyError
 )
 
-from src.models import User
+from src.models import User, follows
 from src.core.security import PasswordHandler
 from src.core.exceptions import (
     InternalServerError,
@@ -15,7 +16,7 @@ from src.core.exceptions import (
     DuplicateValueException
 )
 
-from .utils import same_action_for_sqlalchemy_error
+from .utils import handle_unexpected_db_error
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -26,6 +27,8 @@ if TYPE_CHECKING:
         UpdateUserSchema,
         SetPasswordSchema,
         UserLoginRequestSchema,
+        FollowSchema,
+        UnfollowOrRemoveFollowerSchema
     )
 
 
@@ -54,7 +57,7 @@ class UserCrud:
             raise InternalServerError(msg) from err
 
         except SQLAlchemyError as err:
-            same_action_for_sqlalchemy_error(db, "create `User`", err)
+            handle_unexpected_db_error(db, "create `User`", err)
 
     @staticmethod
     async def update(
@@ -81,7 +84,7 @@ class UserCrud:
             raise InternalServerError(msg) from err
 
         except SQLAlchemyError as err:
-            same_action_for_sqlalchemy_error(db, "update `User`", err)
+            handle_unexpected_db_error(db, "update `User`", err)
 
     @staticmethod
     async def set_new_password(
@@ -92,7 +95,7 @@ class UserCrud:
             user.password = new_password_hash
             await db.commit()
         except SQLAlchemyError as err:
-            same_action_for_sqlalchemy_error(db, "set new password", err)
+            handle_unexpected_db_error(db, "set new password", err)
 
     @staticmethod
     async def verify_user_for_login(
@@ -101,10 +104,13 @@ class UserCrud:
         query = select(User).where(or_(
             User.username == data.identifier, User.email == data.identifier
         ))  # NOTE: data.identifier is whether `username` or `email`
-        result = await db.execute(query)
-        user: Optional[User] = result.scalar_one_or_none()
-        if user is None:
-            return
+        try:
+            result = await db.execute(query)
+            user: Optional[User] = result.scalar_one_or_none()
+            if user is None:
+                return
+        except SQLAlchemyError as err:
+            handle_unexpected_db_error(db, "verify user for login", err)
 
         is_password_verified = PasswordHandler.verify_password(
             plain_password=data.password, hashed_password=user.password
@@ -120,7 +126,7 @@ class UserCrud:
             await db.delete(user)
             await db.commit()
         except SQLAlchemyError as err:
-            same_action_for_sqlalchemy_error(db, "delete `User`", err)
+            handle_unexpected_db_error(db, "delete `User`", err)
 
     @staticmethod
     async def get_by_id(pk: int, db: AsyncSession) -> User:
@@ -142,16 +148,6 @@ class UserCrud:
         # query = select(User.ID, User.username).where(...)
         # users = await db.execute(query)...
         # ...
-        pass  # ToDo: implement later
-
-    # READ from 'follows' association table
-    @staticmethod
-    async def retrieve_followers(db: AsyncSession) -> list[User]:
-        pass  # ToDo: implement later
-
-    # READ from 'follows' association table
-    @staticmethod
-    async def retrieve_followings(db: AsyncSession) -> list[User]:
         pass  # ToDo: implement later
 
     # ----------------------------------------------------------------
@@ -203,3 +199,89 @@ class UserCrud:
             raise InternalServerError(msg) from err
 
         return user
+
+
+class FollowCrud:
+    """ CRUD operations for 'follows' table """
+
+    @staticmethod
+    async def create(
+        current_user_id: int, data: FollowSchema, db: AsyncSession
+    ) -> Literal[1, 0]:
+        """ a user `follows` another one """
+        query = pg_insert(follows).values(
+            followed_by=current_user_id, followed=data.intended_user_id
+        ).on_conflict_do_nothing(index_elements=["followed_by", "followed"])
+        try:
+            result = await db.execute(query)
+            await db.commit()
+            return result.rowcount  # Literal[1, 0]
+        except IntegrityError as e:
+            if 'foreign key constraint "follows_followed_fkey"' in str(e.orig):
+                raise BadRequestException(
+                    f"there's no user with pk={data.intended_user_id}."
+                )
+        except SQLAlchemyError as err:
+            handle_unexpected_db_error(db, "add follow relationship", err)
+
+    @staticmethod
+    async def delete(
+        current_user_id: int,
+        data: UnfollowOrRemoveFollowerSchema,
+        db: AsyncSession
+    ) -> Literal[1, 0]:
+        """ a user `unfollows` another one, or `removes` a follower """
+        match data.operation_type:
+            case "unfollow":
+                and_clause = and_(
+                    follows.c.followed_by == current_user_id,
+                    follows.c.followed == data.intended_user_id
+                )
+            case "remove":
+                and_clause = and_(
+                    follows.c.followed_by == data.intended_user_id,
+                    follows.c.followed == current_user_id
+                )
+            case _:
+                raise BadRequestException("invalid operation-type input!")
+        try:
+            query = delete(follows).where(and_clause)
+            result = await db.execute(query)
+            await db.commit()
+            return result.rowcount  # Literal[1, 0]
+        except SQLAlchemyError as err:
+            handle_unexpected_db_error(db, "delete follow relationship", err)
+
+    @staticmethod
+    async def retrieve_followers(
+        user_id: int, db: AsyncSession
+    ) -> list[tuple[int, str]]:  # [(id, username), (id, username), ...]
+        query = (
+            select(follows.c.followed_by, User.username)
+            .join(User, follows.c.followed_by == User.ID)
+            .where(follows.c.followed == user_id)
+            .order_by(desc(follows.c.follow_at))
+        )
+        try:
+            rows = (await db.execute(query)).all()
+            await db.commit()
+            return rows
+        except SQLAlchemyError as err:
+            handle_unexpected_db_error(db, "retrieve followers-list", err)
+
+    @staticmethod
+    async def retrieve_followings(
+        user_id: int, db: AsyncSession
+    ) -> list[tuple[int, str]]:  # [(id, username), (id, username), ...]
+        query = (
+            select(follows.c.followed, User.username)
+            .join(User, follows.c.followed == User.ID)
+            .where(follows.c.followed_by == user_id)
+            .order_by(desc(follows.c.follow_at))
+        )
+        try:
+            rows = (await db.execute(query)).all()
+            await db.commit()
+            return rows
+        except SQLAlchemyError as err:
+            handle_unexpected_db_error(db, "retrieve followings-list", err)

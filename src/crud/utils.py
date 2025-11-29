@@ -4,7 +4,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from src.core.exceptions import InternalServerError
 
 
-async def same_action_for_sqlalchemy_error(
+async def handle_unexpected_db_error(
     db: AsyncSession, failed_operation: str, err: SQLAlchemyError
 ):
     await db.rollback()

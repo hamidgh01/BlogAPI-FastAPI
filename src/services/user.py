@@ -1,5 +1,5 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from src.core.security import PasswordHandler
 from src.core.exceptions import (
@@ -8,8 +8,10 @@ from src.core.exceptions import (
     BadRequestException,
     NotFoundException
 )
-from src.crud import UserCrud, ProfileCrud, LinkCrud
-from src.schemas.user import UserOutSchema, SetPasswordSchema
+from src.crud import UserCrud, FollowCrud, ProfileCrud, LinkCrud
+from src.schemas.user import (
+    UserOutSchema, SetPasswordSchema, FollowerOrFollowingListSchema
+)
 from src.schemas.profile import ProfileOutAfterUpdate, LinkOut
 
 if TYPE_CHECKING:
@@ -17,10 +19,16 @@ if TYPE_CHECKING:
 
     from src.models import User
     from src.schemas.user import (
-        CreateUserSchema, UpdateUserSchema, UpdatePasswordSchema
+        CreateUserSchema,
+        UpdateUserSchema,
+        UpdatePasswordSchema,
+        FollowSchema,
+        UnfollowOrRemoveFollowerSchema,
     )
     from src.schemas.profile import (
-        UpdateProfileSchema, CreateLinkSchema, UpdateLinkSchema
+        UpdateProfileSchema,
+        CreateLinkSchema,
+        UpdateLinkSchema
     )
 
 
@@ -28,16 +36,10 @@ class UserService:
     """
     User and Profile services
     (interacts with `UserCrud`, `ProfileCrud` & `LinkCrud`)
-
-    register_user   : create both User and Profile object
-    delete_user     : delete User (its related Profile'd be deleted too)
-    update_user             : obvious ;)
-    update_password         : ...
-    reset_password_by_email : ...
-    update_profile          : ...
-    add_link                : ...
-    update_link             : ...
-    delete_link             : ...
+    NOTE:
+    _ the method `register_user()` creates both `User` and `Profile` object
+    _ the method `delete_user()` deletes `User` (and then its related `Profile`
+      would be deleted too)
     """
 
     @staticmethod
@@ -126,6 +128,42 @@ class UserService:
         current_user_id: int, pk: int, db: AsyncSession
     ) -> None:
         await LinkCrud.delete(current_user_id, pk, db)
+
+    @staticmethod
+    async def follow(
+        current_user_id: int, data: FollowSchema, db: AsyncSession
+    ) -> Literal[1, 0]:
+        if current_user_id == data.intended_user_id:
+            raise BadRequestException("impossible request...!")
+        return await FollowCrud.create(current_user_id, data, db)
+
+    @staticmethod
+    async def unfollow_or_remove(
+        current_user_id: int,
+        data: UnfollowOrRemoveFollowerSchema,
+        db: AsyncSession
+    ) -> Literal[1, 0]:
+        if current_user_id == data.intended_user_id:
+            raise BadRequestException("impossible request...!")
+        return await FollowCrud.delete(current_user_id, data, db)
+
+    @staticmethod
+    async def get_followers_list(
+        user_id: int, db: AsyncSession
+    ) -> FollowerOrFollowingListSchema:
+        result = await FollowCrud.retrieve_followers(user_id, db)
+        return FollowerOrFollowingListSchema(users_list=list(
+            map(lambda row: UserOutSchema(ID=row[0], username=row[1]), result)
+        ))
+
+    @staticmethod
+    async def get_followings_list(
+        user_id: int, db: AsyncSession
+    ) -> FollowerOrFollowingListSchema:
+        result = await FollowCrud.retrieve_followings(user_id, db)
+        return FollowerOrFollowingListSchema(users_list=list(
+            map(lambda row: UserOutSchema(ID=row[0], username=row[1]), result)
+        ))
 
     # @staticmethod
     # async def delete_user(current_user: User, db: AsyncSession) -> None:

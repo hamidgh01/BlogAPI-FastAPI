@@ -7,7 +7,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from src.models import Profile, Link
 from src.core.exceptions import BadRequestException, NotFoundException
 
-from .utils import same_action_for_sqlalchemy_error
+from .utils import handle_unexpected_db_error
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -36,7 +36,7 @@ class ProfileCrud:
             # await db.refresh(profile)
             # return profile
         except SQLAlchemyError as err:
-            same_action_for_sqlalchemy_error(db, "create `Profile`", err)
+            handle_unexpected_db_error(db, "create `Profile`", err)
 
     @staticmethod
     async def update(
@@ -54,7 +54,7 @@ class ProfileCrud:
             updated_profile: Optional[Profile] = result.scalars().one_or_none()
             # if updated_profile is None:  # ToDo: handle it later
         except SQLAlchemyError as err:
-            same_action_for_sqlalchemy_error(db, "update `Profile`", err)
+            handle_unexpected_db_error(db, "update `Profile`", err)
 
         return updated_profile
 
@@ -88,7 +88,7 @@ class LinkCrud:
             await db.commit()
             created_links: list[Link] = result.scalars().all()
         except SQLAlchemyError as err:
-            same_action_for_sqlalchemy_error(db, "create `Links`", err)
+            handle_unexpected_db_error(db, "create `Links`", err)
 
         return created_links
 
@@ -107,7 +107,7 @@ class LinkCrud:
             await db.commit()
             updated_link: Optional[Link] = result.scalars().one_or_none()
         except SQLAlchemyError as err:
-            same_action_for_sqlalchemy_error(db, "update `Links`", err)
+            handle_unexpected_db_error(db, "update `Links`", err)
 
         return updated_link  # Link | None
 

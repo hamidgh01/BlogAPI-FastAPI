@@ -1,5 +1,4 @@
-"""
-user-related routes
+""" user-related routes
 * both `UserService` and `AuthService` provide their services here
 """
 
@@ -54,7 +53,7 @@ async def logout(
 
 @router.get("/renew-tokens", status_code=status.HTTP_200_OK)
 async def renew_tokens(
-    request: Request,  # <---------- is this route vulnerable against CSRF ???
+    request: Request,
     response: Response,
     redis: Annotated[Redis, Depends(deps.get_redis)]
 ) -> Token:
@@ -87,7 +86,7 @@ async def update_password(
 @router.put("/profile", status_code=status.HTTP_202_ACCEPTED)
 async def update_profile(
     data: profile_sch.UpdateProfileSchema,
-    current_user_id: Annotated[User, Depends(deps.get_current_user_id)],
+    current_user_id: Annotated[int, Depends(deps.get_current_user_id)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ) -> profile_sch.ProfileOutAfterUpdate:
     return await UserService.update_profile(current_user_id, data, db)
@@ -96,7 +95,7 @@ async def update_profile(
 @router.post("/link", status_code=status.HTTP_201_CREATED)
 async def add_link(
     data: list[profile_sch.CreateLinkSchema],
-    current_user_id: Annotated[User, Depends(deps.get_current_user_id)],
+    current_user_id: Annotated[int, Depends(deps.get_current_user_id)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ) -> list[profile_sch.LinkOut]:
     return await UserService.add_link(current_user_id, data, db)
@@ -106,7 +105,7 @@ async def add_link(
 async def update_link(
     pk: Annotated[int, Path(..., gt=0, description="unique ID of link")],
     data: profile_sch.UpdateLinkSchema,
-    current_user_id: Annotated[User, Depends(deps.get_current_user_id)],
+    current_user_id: Annotated[int, Depends(deps.get_current_user_id)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ) -> profile_sch.LinkOut:
     return await UserService.update_link(current_user_id, pk, data, db)
@@ -115,7 +114,7 @@ async def update_link(
 @router.delete("/link/{pk}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_link(
     pk: Annotated[int, Path(..., gt=0, description="unique ID of link")],
-    current_user_id: Annotated[User, Depends(deps.get_current_user_id)],
+    current_user_id: Annotated[int, Depends(deps.get_current_user_id)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ):
     await UserService.delete_link(current_user_id, pk, db)
@@ -128,3 +127,58 @@ async def delete_link(
 #     db: Annotated[AsyncSession, Depends(deps.get_db)]
 # ):
 #     await UserService.delete_user(current_user, db)
+
+
+@router.post("/follow", status_code=status.HTTP_201_CREATED)
+async def follow(
+    data: user_sch.FollowSchema,
+    current_user_id: Annotated[int, Depends(deps.get_current_user_id)],
+    db: Annotated[AsyncSession, Depends(deps.get_db)]
+) -> Message:
+    result = await UserService.follow(current_user_id, data, db)
+    if result == 1:
+        return Message(message="followed successfully.")
+    else:  # result == 0
+        status.HTTP_400_BAD_REQUEST
+        return Message(message="already followed!!! nothing changed.")
+        # ToDo: decide to send a proper status-code here. e.g. 304_NOT_MODIFIED
+        # or 406_NOT_ACCEPTABLE or 400_BAD_REQUEST or 200_OK or ...
+
+
+@router.delete("/follow", status_code=status.HTTP_202_ACCEPTED)
+async def unfollow_or_remove(
+    data: user_sch.UnfollowOrRemoveFollowerSchema,
+    current_user_id: Annotated[int, Depends(deps.get_current_user_id)],
+    db: Annotated[AsyncSession, Depends(deps.get_db)]
+) -> Message:
+    result = await UserService.unfollow_or_remove(current_user_id, data, db)
+    if result == 1:
+        return Message(message="follow-relationship deleted successfully.")
+    else:  # result == 0
+        return Message(message="NO follow-relationship to delete!!!")
+        # ToDo: decide to send a proper status-code here.
+        # e.g. 304_NOT_MODIFIED or 406_NOT_ACCEPTABLE or 400_BAD_REQUEST or ...
+
+
+# maybe path will change to: "/@{username}/followers"
+@router.get("/followers/{user_id}", status_code=status.HTTP_200_OK)
+async def followers_list(
+    user_id: Annotated[int, Path(
+        ..., gt=0,
+        description="ID of the user whose followers-list is being requested"
+    )],
+    db: Annotated[AsyncSession, Depends(deps.get_db)]
+) -> user_sch.FollowerOrFollowingListSchema:
+    return await UserService.get_followers_list(user_id, db)
+
+
+# maybe path will change to: "/@{username}/followings"
+@router.get("/followings/{user_id}", status_code=status.HTTP_200_OK)
+async def followings_list(
+    user_id: Annotated[int, Path(
+        ..., gt=0,
+        description="ID of the user whose followings-list is being requested"
+    )],
+    db: Annotated[AsyncSession, Depends(deps.get_db)]
+) -> user_sch.FollowerOrFollowingListSchema:
+    return await UserService.get_followings_list(user_id, db)
