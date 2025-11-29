@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from pydantic import ValidationError
 import pytest
 
 from src.schemas import (
@@ -10,7 +11,8 @@ from src.schemas import (
     UserOutSchema,
     UserLoginRequestSchema,
     LoginSuccessfulData,
-    FollowOrUnfollowSchema,
+    FollowSchema,
+    UnfollowOrRemoveFollowerSchema,
     FollowerOrFollowingListSchema
 )
 from src.schemas.admin import (
@@ -189,12 +191,27 @@ def test_healthiness_of_user_details_for_admin_schema():
     assert sch.updated_at > sch.created_at
 
 
-def test_healthiness_of_follow_or_unfollow_schema():
-    """
-    test successful validation and serialization in FollowOrUnfollowSchema()
-    """
-    sch = FollowOrUnfollowSchema(intended_user_id=2345)
+def test_healthiness_of_follow_schema():
+    """ test successful validation and serialization in FollowSchema() """
+    sch = FollowSchema(intended_user_id=2345)
     assert type(sch.intended_user_id) is int and sch.intended_user_id == 2345
+
+
+def test_healthiness_of_unfollow_or_remove_follower_schema():
+    """ test successful validation and serialization
+    in UnfollowOrRemoveFollowerSchema() """
+    sch = UnfollowOrRemoveFollowerSchema(
+        operation_type="remove", intended_user_id=2345
+    )
+    assert type(sch.intended_user_id) is int and sch.intended_user_id == 2345
+    assert type(sch.operation_type) is str and sch.operation_type == "remove"
+
+    with pytest.raises(ValidationError) as err:
+        UnfollowOrRemoveFollowerSchema(
+            operation_type="invalid-value", intended_user_id=2345
+        )
+
+    assert "Input should be 'unfollow' or 'remove'" in str(err.value)
 
 
 def test_healthiness_of_follower_or_following_list_schema():

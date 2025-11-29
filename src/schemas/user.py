@@ -1,6 +1,6 @@
 """ Schemas (Pydantic models) for 'User' Model """
 
-from typing import Annotated, Optional
+from typing import Annotated, Optional, Literal
 from re import fullmatch
 
 from pydantic import BaseModel, Field, EmailStr, field_validator, ConfigDict
@@ -114,12 +114,24 @@ class LoginSuccessfulData(BaseModel):
 # --------------------------------------------------------------------
 
 
-class FollowOrUnfollowSchema(BaseModel):
-    # user_id: int
-    #   -> ID of the user who wants to follow or unfollow another one
-    #   -> it'll be extracted form auth-token
+class FollowSchema(BaseModel):
+    # user_id: int (will be extracted form auth-token)
+    # -> ID of user who wants to follow another one
     intended_user_id: Annotated[int, Field(
-        ..., description="ID of the intended user to follow or unfollow"
+        ..., ge=1, description="ID of the intended user to 'follow'"
+    )]
+
+
+class UnfollowOrRemoveFollowerSchema(BaseModel):
+    # user_id: int (it'll be extracted form auth-token)
+    # -> ID of user who wants to unfollow another one or remove a follower
+    operation_type: Annotated[
+        Literal["unfollow", "remove"],
+        Field(..., description="type of operation: 'unfollow' or 'remove'")
+    ]
+    intended_user_id: Annotated[int, Field(
+        ..., ge=1,
+        description="ID of the intended user to 'unfollow' or 'remove'"
     )]
 
 

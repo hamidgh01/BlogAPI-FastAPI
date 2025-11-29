@@ -6,7 +6,8 @@ from .user import (
     UserOutSchema,
     UserLoginRequestSchema,
     LoginSuccessfulData,
-    FollowOrUnfollowSchema,
+    FollowSchema,
+    UnfollowOrRemoveFollowerSchema,
     FollowerOrFollowingListSchema,
 )
 from .post import (
@@ -60,7 +61,8 @@ __all__ = [
     "UserOutSchema",
     "UserLoginRequestSchema",
     "LoginSuccessfulData",
-    "FollowOrUnfollowSchema",
+    "FollowSchema",
+    "UnfollowOrRemoveFollowerSchema",
     "FollowerOrFollowingListSchema",
     # Post & Tag Schemas
     "CreatePostSchema",
