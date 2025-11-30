@@ -30,12 +30,10 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     """
     Table/Model: Post (posts)
     Fields:
-        ID (PK), title, slug, content, reading_time, status, is_private
+        ID (PK), title, content, reading_time, status, is_private
         created_at, published_at, updated_at, user_id (FK)
 
     Points/Notes:
-        _ 'slug' is generated via 'title' [calculated_field]
-        _ post_details is fetched using 'ID' (slug usage: making semantic url)
         _ 'reading_time' is generated via 'content' [calculated_field]
 
     Relations:
@@ -59,7 +57,6 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         nullable=False,
         index=True
     )
-    slug: Mapped[str] = mapped_column(String, nullable=True)
     content: Mapped[str] = mapped_column(Text, nullable=True)
     reading_time: Mapped[int] = mapped_column(SmallInteger, nullable=True)
     status: Mapped[PostStatus] = mapped_column(
@@ -67,7 +64,9 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         default=PostStatus.DR, nullable=False
     )
     is_private: Mapped[bool] = mapped_column(Boolean, default=False)
-    published_at: Mapped[datetime] = mapped_column(DateTime, nullable=True)  # ToDo: I'll possibly index this column
+    published_at: Mapped[datetime] = mapped_column(
+        DateTime, nullable=True, index=True
+    )
 
     # N:1 with User (backref: author)
     user_id: Mapped[int] = mapped_column(

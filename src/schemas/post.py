@@ -4,7 +4,9 @@ from typing import Annotated, Optional
 from re import compile
 from datetime import datetime
 
-from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic import (
+    BaseModel, Field, field_validator, computed_field, ConfigDict
+)
 
 from src.models import PostStatus
 from .user import UserOutSchema
@@ -40,8 +42,6 @@ class CreatePostSchema(BaseModel):
     # if status=DR -> published_at=null
     # if status=PB -> published_at: is set in backend
     # (a user can't draft a published post again! but it can make that private)
-    # NOTE:
-    # 'slug' and 'reading_time' is generated in backend
 
     tags: Annotated[Optional[list[str]], Field(
         default_factory=list,
@@ -60,6 +60,19 @@ class CreatePostSchema(BaseModel):
     @classmethod
     def validate_tags(cls, tags: list[str]) -> list[str]:
         return [validate_tag_name(tag) for tag in tags]
+
+    @computed_field
+    def reading_time(self) -> int | None:
+        """ calculate reading time (in seconds) based on content length """
+        if self.content is None:
+            return None
+        if not self.content:
+            return 1
+        wpm = 200  # default reading speed is 200 words per minute (wpm)
+        word_count = len(self.content.split())
+        seconds = int((word_count / wpm) * 60)
+
+        return max(1, seconds)
 
 
 class UpdatePostSchema(BaseModel):
@@ -90,6 +103,18 @@ class UpdatePostSchema(BaseModel):
     def validate_tags(cls, tags: list[str]) -> list[str]:
         return [validate_tag_name(tag) for tag in tags]
 
+    @computed_field
+    def reading_time(self) -> int | None:
+        if self.content is None:
+            return None
+        if not self.content:
+            return 1
+        wpm = 200  # default reading speed is 200 words per minute (wpm)
+        word_count = len(self.content.split())
+        seconds = int((word_count / wpm) * 60)
+
+        return max(1, seconds)
+
 
 class ChangePostPrivacySchema(BaseModel):
     is_private: Annotated[bool, Field(..., description="being Private/Public")]
@@ -119,7 +144,6 @@ class ReadTagSchema(BaseModel):  # for both 'tag_list' and 'tag_details'
 class PostListSchema(BaseModel):
     ID: int
     title: str
-    slug: Optional[str] = None
     reading_time: Annotated[Optional[int], Field(
         None, description="Estimated reading time (seconds)"
     )]

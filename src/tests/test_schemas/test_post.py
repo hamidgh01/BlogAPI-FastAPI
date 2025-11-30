@@ -63,9 +63,10 @@ def test_healthiness_of_create_post_schema():
     post_sch1 = CreatePostSchema(
         title="test title",
         content="test long text as title.\n" * 10,
-    )
+    )  # 50 word --200wpm--> .25 min -> 15 sec (reading_time)
     assert post_sch1.title == "test title"
     assert "test long text as title." in post_sch1.content
+    assert post_sch1.reading_time == 15
     assert post_sch1.is_private is False
     assert post_sch1.status.value == "draft"
     assert post_sch1.tags == []
@@ -90,6 +91,7 @@ def test_healthiness_of_update_post_schema():
     upd_post_sch1 = UpdatePostSchema()
     assert upd_post_sch1.title is None
     assert upd_post_sch1.content is None
+    assert upd_post_sch1.reading_time is None
     assert upd_post_sch1.is_private is False
     assert upd_post_sch1.tags == []
 
@@ -101,6 +103,7 @@ def test_healthiness_of_update_post_schema():
     )
     assert upd_post_sch2.title == "test title"
     assert "test long text as title." in upd_post_sch2.content
+    assert type(rt := upd_post_sch2.reading_time) is int and rt > 14
     assert upd_post_sch2.is_private is True
     assert "Python3" in upd_post_sch2.tags
     assert upd_post_sch2.tags[1] == "Asynchronous_Programming"
@@ -161,14 +164,13 @@ def test_healthiness_of_post_details_schema():
     assert sch1.updated_at > sch1.created_at
     assert sch1.user.username == "hamid01"
     assert type(sch1.like_count) is type(sch1.comment_count)
-    assert sch1.content is None and sch1.slug is None and sch1.tags is None
+    assert sch1.content is None and sch1.tags is None
     assert sch1.published_at is None and sch1.reading_time is None
     assert sch1.saved_by_viewer is False and sch1.liked_by_viewer is True
 
     sch2 = PostDetailsSchema(
         ID=543,
         title="test title",
-        slug="test-title",
         content="a long text as content of the post.\n" * 10,
         reading_time=320,
         created_at=datetime.now() - timedelta(days=54),
@@ -188,7 +190,6 @@ def test_healthiness_of_post_details_schema():
         saved_by_viewer=False,
         liked_by_viewer=True,
     )
-    assert len(sch2.slug) == len(sch2.title)
     assert "text as content of the post.\na long text" in sch2.content
     assert type(sch2.reading_time) is int
     assert type(sch2.published_at) is datetime
@@ -221,14 +222,13 @@ def test_healthiness_of_post_details_for_admin_schema():
     assert sch1.status.name == "PB"
     assert sch1.user.username == "hamid01"
     assert type(sch1.like_count) is type(sch1.comment_count)
-    assert sch1.content is None and sch1.slug is None and sch1.tags is None
+    assert sch1.content is None and sch1.tags is None
     assert sch1.published_at is None and sch1.reading_time is None
     assert sch1.saved_by_viewer is False and sch1.liked_by_viewer is True
 
     sch2 = PostDetailsForAdminSchema(
         ID=543,
         title="test title",
-        slug="test-title",
         content="a long text as content of the post.\n" * 10,
         reading_time=320,
         created_at=datetime.now() - timedelta(days=54),
@@ -250,7 +250,6 @@ def test_healthiness_of_post_details_for_admin_schema():
         saved_by_viewer=False,
         liked_by_viewer=True,
     )
-    assert len(sch2.slug) == len(sch2.title)
     assert "text as content of the post.\na long text" in sch2.content
     assert type(sch2.is_private) is bool
     assert sch2.status.value == "draft" and sch2.status.name == "DR"

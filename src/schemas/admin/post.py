@@ -13,7 +13,6 @@ from ..post import ReadTagSchema
 class PostListForAdminSchema(BaseModel):
     ID: int
     title: str
-    slug: Optional[str] = None
     reading_time: Annotated[Optional[int], Field(
         None, description="Estimated reading time (seconds)"
     )]
