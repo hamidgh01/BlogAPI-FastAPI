@@ -5,7 +5,6 @@ from sqlalchemy import String, ForeignKey, Table, Column, PrimaryKeyConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base import Base
-from ._mixins import CreatedAtFieldMixin
 
 if TYPE_CHECKING:
     from . import Post
@@ -34,14 +33,14 @@ posts_tags = Table(
 )
 
 
-class Tag(Base, CreatedAtFieldMixin):
+class Tag(Base):
     """
     Table/Model: Tag (tags)
     Fields:
-        ID (PK), name, created_at
+        ID (PK), name
     Relations:
-        _ N:N (Many to Many) with 'Post' -> Post.tags / Tag.posts
-          (via posts_tags association table)
+    _ N:N (Many to Many) with 'Post' -> Post.tags / Tag.posts
+        (via posts_tags association table)
     """
 
     __tablename__ = "tags"
