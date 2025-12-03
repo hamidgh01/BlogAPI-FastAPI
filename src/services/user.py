@@ -57,7 +57,7 @@ class UserService:
         current_user: User, data: UpdateUserSchema, db: AsyncSession
     ) -> UserOutSchema:
         user = await UserCrud.update(current_user, data, db)
-        return UserOutSchema(ID=user.ID, username=user.username)
+        return UserOutSchema.model_validate(user)
 
     @staticmethod
     async def update_password(
@@ -82,13 +82,7 @@ class UserService:
         current_user_id: int, data: UpdateProfileSchema, db: AsyncSession
     ) -> ProfileOutAfterUpdate:
         profile = await ProfileCrud.update(current_user_id, data, db)
-        return ProfileOutAfterUpdate(
-            user_id=profile.user_id,
-            display_name=profile.display_name,
-            about=profile.about,
-            birth_date=profile.birth_date,
-            gender=profile.gender
-        )
+        return ProfileOutAfterUpdate.model_validate(profile)
 
     @staticmethod
     async def add_link(
@@ -98,13 +92,8 @@ class UserService:
             return []  # ToDo: maybe change here
         if any(link_sch.profile_id != current_user_id for link_sch in data):
             raise ForbiddenException("Operation is not allowed!")
-        links = await LinkCrud.create(data, db)
-        return [LinkOut(
-            ID=updated_link.ID,
-            title=updated_link.title,
-            url=updated_link.url,
-            profile_id=updated_link.profile_id
-        ) for updated_link in links]
+        updated_links = await LinkCrud.create(data, db)
+        return [LinkOut.model_validate(link) for link in updated_links]
 
     @staticmethod
     async def update_link(
@@ -116,12 +105,7 @@ class UserService:
                 f"Requester(pk='{current_user_id}') is not owner of "
                 f"any Link with pk='{pk}'"
             )
-        return LinkOut(
-            ID=updated_link.profile_id,
-            title=updated_link.title,
-            url=updated_link.url,
-            profile_id=updated_link.profile_id
-        )
+        return LinkOut.model_validate(updated_link)
 
     @staticmethod
     async def delete_link(

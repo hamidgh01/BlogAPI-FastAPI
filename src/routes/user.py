@@ -139,7 +139,7 @@ async def follow(
     if result == 1:
         return Message(message="followed successfully.")
     else:  # result == 0
-        status.HTTP_400_BAD_REQUEST
+        # status.HTTP_400_BAD_REQUEST
         return Message(message="already followed!!! nothing changed.")
         # ToDo: decide to send a proper status-code here. e.g. 304_NOT_MODIFIED
         # or 406_NOT_ACCEPTABLE or 400_BAD_REQUEST or 200_OK or ...

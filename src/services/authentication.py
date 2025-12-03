@@ -47,7 +47,7 @@ class AuthService:
                 "Invalid username, email or password"
             )
 
-        user = UserOutSchema(ID=user.ID, username=user.username)
+        user = UserOutSchema.model_validate(user)
         access_token = JWTHandler.generate_token(user.ID, "access")
         refresh_token = JWTHandler.generate_token(user.ID, "refresh")
 

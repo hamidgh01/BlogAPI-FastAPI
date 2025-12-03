@@ -45,7 +45,7 @@ class LinkOut(CreateLinkSchema):
 # Profile Schemas
 
 
-class _BaseProfileSchema(BaseModel):
+class UpdateProfileSchema(BaseModel):
     display_name: Annotated[Optional[str], Field(
         None, max_length=64, description="Display name (optional)"
     )]
@@ -55,24 +55,6 @@ class _BaseProfileSchema(BaseModel):
     birth_date: Annotated[Optional[date], Field(
         None, description="Birth date (optional)"
     )]
-    # gender: Annotated[Gender, Field(
-    #     default=Gender.NS,
-    #     description="Gender enum (male / female / other / not-specified)"
-    # )]
-    # profile_photo
-
-
-# class InitialProfileSchema(_BaseProfileSchema):
-#     """
-#     Since Profile is 1:1 with User, create-profile is tied to user creation.
-#     after creating user (and then profile object using 'user_id'):
-#     as the next step: user can fill out profile fields (separated request)
-#     """
-#     pass
-
-
-class UpdateProfileSchema(_BaseProfileSchema):
-    # All fields optional for partial updates
     gender: Annotated[Optional[Gender], Field(
         None,
         description="Gender enum (male / female / other / not-specified)"

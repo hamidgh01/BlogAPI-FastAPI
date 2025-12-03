@@ -36,7 +36,7 @@ class ProfileCrud:
             # await db.refresh(profile)
             # return profile
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "create `Profile`", err)
+            await handle_unexpected_db_error(db, "create `Profile`", err)
 
     @staticmethod
     async def update(
@@ -54,7 +54,7 @@ class ProfileCrud:
             updated_profile: Optional[Profile] = result.scalars().one_or_none()
             # if updated_profile is None:  # ToDo: handle it later
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "update `Profile`", err)
+            await handle_unexpected_db_error(db, "update `Profile`", err)
 
         return updated_profile
 
@@ -88,7 +88,7 @@ class LinkCrud:
             await db.commit()
             created_links: list[Link] = result.scalars().all()
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "create `Links`", err)
+            await handle_unexpected_db_error(db, "create `Links`", err)
 
         return created_links
 
@@ -99,6 +99,8 @@ class LinkCrud:
         data = data.model_dump(exclude_none=True)
         if len(data) <= 1:  # profile_id is required, so `len` at least = 1
             raise BadRequestException("Empty field values to update.")
+        if data.get("url", None):
+            data["url"] = str(data["url"])
         try:
             query = update(Link).where(
                 and_(Link.ID == pk, Link.profile_id == current_user_id)
@@ -107,7 +109,7 @@ class LinkCrud:
             await db.commit()
             updated_link: Optional[Link] = result.scalars().one_or_none()
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "update `Links`", err)
+            await handle_unexpected_db_error(db, "update `Links`", err)
 
         return updated_link  # Link | None
 

@@ -57,7 +57,7 @@ class UserCrud:
             raise InternalServerError(msg) from err
 
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "create `User`", err)
+            await handle_unexpected_db_error(db, "create `User`", err)
 
     @staticmethod
     async def update(
@@ -84,7 +84,7 @@ class UserCrud:
             raise InternalServerError(msg) from err
 
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "update `User`", err)
+            await handle_unexpected_db_error(db, "update `User`", err)
 
     @staticmethod
     async def set_new_password(
@@ -95,7 +95,7 @@ class UserCrud:
             user.password = new_password_hash
             await db.commit()
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "set new password", err)
+            await handle_unexpected_db_error(db, "set new password", err)
 
     @staticmethod
     async def verify_user_for_login(
@@ -110,7 +110,7 @@ class UserCrud:
             if user is None:
                 return
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "verify user for login", err)
+            await handle_unexpected_db_error(db, "verify user for login", err)
 
         is_password_verified = PasswordHandler.verify_password(
             plain_password=data.password, hashed_password=user.password
@@ -126,10 +126,10 @@ class UserCrud:
             await db.delete(user)
             await db.commit()
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "delete `User`", err)
+            await handle_unexpected_db_error(db, "delete `User`", err)
 
     @staticmethod
-    async def get_by_id(pk: int, db: AsyncSession) -> User:
+    async def get_by_id(pk: int, db: AsyncSession) -> User:  # ToDo: change it to: [id, username]
         user = await db.get(User, pk)
         if user is None:
             raise NotFoundException(f"User with 'ID={pk}' is not found!")
@@ -222,7 +222,7 @@ class FollowCrud:
                     f"there's no user with pk={data.intended_user_id}."
                 )
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "add follow relationship", err)
+            await handle_unexpected_db_error(db, "add follow relation", err)
 
     @staticmethod
     async def delete(
@@ -250,7 +250,7 @@ class FollowCrud:
             await db.commit()
             return result.rowcount  # Literal[1, 0]
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "delete follow relationship", err)
+            await handle_unexpected_db_error(db, "delete follow relation", err)
 
     @staticmethod
     async def retrieve_followers(
@@ -267,7 +267,7 @@ class FollowCrud:
             await db.commit()
             return rows
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "retrieve followers-list", err)
+            await handle_unexpected_db_error(db, "get followers-list", err)
 
     @staticmethod
     async def retrieve_followings(
@@ -284,4 +284,4 @@ class FollowCrud:
             await db.commit()
             return rows
         except SQLAlchemyError as err:
-            handle_unexpected_db_error(db, "retrieve followings-list", err)
+            await handle_unexpected_db_error(db, "get followings-list", err)
