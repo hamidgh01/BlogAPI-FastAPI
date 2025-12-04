@@ -5,52 +5,52 @@ other users don't have access them)
 """
 
 from .user import (
-    UpdateUserForAdminSchema,
-    UserListSchema,
-    UserDetailsForAdminSchema
+    UserUpdateForAdmin,
+    UserListOut,
+    UserOutForAdmin
 )
 from .post import (
-    PostListForAdminSchema,
-    PostDetailsForAdminSchema
+    PostListOutForAdmin,
+    PostDetailsOutForAdmin
 )
 from .ticket import (
-    TicketListSchema,
-    TicketDetailsSchema,
-    UpdateTicketStatusSchema
+    TicketListOut,
+    TicketDetailsOut,
+    TicketUpdateStatus
 )
-from .comment import CommentListSchema
+from .comment import CommentListOut
 from .reports import (
-    ReportOnUserListSchema,
-    ReportOnUserDetailsSchema,
-    ReportOnPostListSchema,
-    ReportOnPostDetailsSchema
+    ReportOnUserListOut,
+    ReportOnUserDetailsOut,
+    ReportOnPostListOut,
+    ReportOnPostDetailsOut
 )
 from .profile import (
-    ProfileListForAdminPanelSchema,
-    ProfileDetailsForAdminPanelSchema
+    ProfileListOutForAdmin,
+    ProfileDetailsOutForAdmin
 )
 
 
 __all__ = [
     # User Schemas
-    "UpdateUserForAdminSchema",
-    "UserListSchema",
-    "UserDetailsForAdminSchema",
+    "UserUpdateForAdmin",
+    "UserListOut",
+    "UserOutForAdmin",
     # Post
-    "PostListForAdminSchema",
-    "PostDetailsForAdminSchema",
+    "PostListOutForAdmin",
+    "PostDetailsOutForAdmin",
     # Ticket
-    "TicketListSchema",
-    "TicketDetailsSchema",
-    "UpdateTicketStatusSchema",
+    "TicketListOut",
+    "TicketDetailsOut",
+    "TicketUpdateStatus",
     # Comment
-    "CommentListSchema",
+    "CommentListOut",
     # Reports (on users and posts)
-    "ReportOnUserListSchema",
-    "ReportOnUserDetailsSchema",
-    "ReportOnPostListSchema",
-    "ReportOnPostDetailsSchema",
+    "ReportOnUserListOut",
+    "ReportOnUserDetailsOut",
+    "ReportOnPostListOut",
+    "ReportOnPostDetailsOut",
     # Profile
-    "ProfileListForAdminPanelSchema",
-    "ProfileDetailsForAdminPanelSchema"
+    "ProfileListOutForAdmin",
+    "ProfileDetailsOutForAdmin"
 ]

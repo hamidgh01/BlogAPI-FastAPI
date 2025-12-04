@@ -1,20 +1,14 @@
 """ admin-specific 'Comment' schemas """
 
-from typing import Annotated
+from typing import Annotated, Literal
 from datetime import datetime
-from enum import Enum
 
 from pydantic import BaseModel, Field, ConfigDict
 
 from src.models import CommentStatus
 
 
-class ParentType(Enum):
-    P = "post"
-    C = "comment"
-
-
-class CommentListSchema(BaseModel):
+class CommentListOut(BaseModel):
     ID: int
     user_id: int
     content: Annotated[str, Field(
@@ -25,7 +19,7 @@ class CommentListSchema(BaseModel):
                          "published / Hidden-by-Admin / Deleted-By-Commenter"
     )]
     created_at: datetime
-    parent_type: Annotated[ParentType, Field(
+    parent_type: Annotated[Literal["post", "comment"], Field(
         ..., description="specifies parent-type (can be 'post' or 'comment')"
     )]
     parent_id: Annotated[int, Field(

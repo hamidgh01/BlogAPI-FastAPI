@@ -23,11 +23,11 @@ if TYPE_CHECKING:
     from pydantic import EmailStr
 
     from src.schemas.user import (
-        CreateUserSchema,
-        UpdateUserSchema,
-        SetPasswordSchema,
-        UserLoginRequestSchema,
-        FollowSchema,
+        UserCreate,
+        UserUpdate,
+        SetPassword,
+        UserLoginRequest,
+        FollowCreate,
         UnfollowOrRemoveFollowerSchema
     )
 
@@ -36,7 +36,7 @@ class UserCrud:
     """ CRUD operations for User model """
 
     @staticmethod
-    async def create(data: CreateUserSchema, db: AsyncSession) -> User:
+    async def create(data: UserCreate, db: AsyncSession) -> User:
         try:
             data = data.model_dump(exclude={"confirm_password"})
             data["password"] = PasswordHandler.hash_password(data["password"])
@@ -60,9 +60,7 @@ class UserCrud:
             await handle_unexpected_db_error(db, "create `User`", err)
 
     @staticmethod
-    async def update(
-        user: User, data: UpdateUserSchema, db: AsyncSession
-    ) -> User:
+    async def update(user: User, data: UserUpdate, db: AsyncSession) -> User:
         data = data.model_dump(exclude_none=True)
         if not data:
             raise BadRequestException("Empty field values to update.")
@@ -88,7 +86,7 @@ class UserCrud:
 
     @staticmethod
     async def set_new_password(
-        user: User, data: SetPasswordSchema, db: AsyncSession
+        user: User, data: SetPassword, db: AsyncSession
     ) -> None:
         try:
             new_password_hash = PasswordHandler.hash_password(data.password)
@@ -99,7 +97,7 @@ class UserCrud:
 
     @staticmethod
     async def verify_user_for_login(
-        data: UserLoginRequestSchema, db: AsyncSession
+        data: UserLoginRequest, db: AsyncSession
     ) -> User | None:
         query = select(User).where(or_(
             User.username == data.identifier, User.email == data.identifier
@@ -206,7 +204,7 @@ class FollowCrud:
 
     @staticmethod
     async def create(
-        current_user_id: int, data: FollowSchema, db: AsyncSession
+        current_user_id: int, data: FollowCreate, db: AsyncSession
     ) -> Literal[1, 0]:
         """ a user `follows` another one """
         query = pg_insert(follows).values(

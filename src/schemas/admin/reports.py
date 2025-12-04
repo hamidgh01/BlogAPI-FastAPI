@@ -12,7 +12,7 @@ from src.models import UserReportTitleChoices, PostReportTitleChoices
 # ReportOnUser Schemas
 
 
-class ReportOnUserListSchema(BaseModel):
+class ReportOnUserListOut(BaseModel):
     ID: int
     title: Annotated[UserReportTitleChoices, Field(
         ..., description="Title (report reason enum for users)")]
@@ -24,7 +24,7 @@ class ReportOnUserListSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ReportOnUserDetailsSchema(ReportOnUserListSchema):
+class ReportOnUserDetailsOut(ReportOnUserListOut):
     reporter_id: Annotated[Optional[int], Field(
         None, description="ID of reporter-user (nullable)"
     )]
@@ -35,7 +35,7 @@ class ReportOnUserDetailsSchema(ReportOnUserListSchema):
 # ReportOnPost Schemas
 
 
-class ReportOnPostListSchema(BaseModel):
+class ReportOnPostListOut(BaseModel):
     ID: int
     title: Annotated[PostReportTitleChoices, Field(
         ..., description="Title (report reason enum for posts)")]
@@ -47,7 +47,7 @@ class ReportOnPostListSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ReportOnPostDetailsSchema(ReportOnUserListSchema):
+class ReportOnPostDetailsOut(ReportOnUserListOut):
     reporter_id: Annotated[Optional[int], Field(
         None, description="ID of reporter-user (nullable)"
     )]

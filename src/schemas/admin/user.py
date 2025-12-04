@@ -7,7 +7,7 @@ from datetime import datetime
 from pydantic import BaseModel, EmailStr, Field, field_validator, ConfigDict
 
 
-class UpdateUserForAdminSchema(BaseModel):
+class UserUpdateForAdmin(BaseModel):
     username: Annotated[Optional[str], Field(
         None, min_length=3, max_length=64,
         description="Update username: Unique / only: 'a-z' , '0-9' , '_'"
@@ -33,7 +33,7 @@ class UpdateUserForAdminSchema(BaseModel):
         return value
 
 
-class UserListSchema(BaseModel):
+class UserListOut(BaseModel):
     ID: int
     username: str
     is_active: Annotated[bool, Field(
@@ -46,7 +46,7 @@ class UserListSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class UserDetailsForAdminSchema(UserListSchema):
+class UserOutForAdmin(UserListOut):
     email: EmailStr
     created_at: datetime
     updated_at: datetime

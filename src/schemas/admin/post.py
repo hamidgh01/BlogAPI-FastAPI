@@ -6,11 +6,11 @@ from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict
 
 from src.models import PostStatus
-from ..user import UserOutSchema
-from ..post import ReadTagSchema
+from ..user import UserOut
+from ..post import TagOut
 
 
-class PostListForAdminSchema(BaseModel):
+class PostListOutForAdmin(BaseModel):
     ID: int
     title: str
     reading_time: Annotated[Optional[int], Field(
@@ -25,7 +25,7 @@ class PostListForAdminSchema(BaseModel):
     created_at: datetime
     published_at: Optional[datetime] = None
 
-    user: Annotated[UserOutSchema, Field(
+    user: Annotated[UserOut, Field(
         ..., description="Contains 'username' and 'id' of related user"
     )]
 
@@ -38,13 +38,13 @@ class PostListForAdminSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class PostDetailsForAdminSchema(PostListForAdminSchema):
+class PostDetailsOutForAdmin(PostListOutForAdmin):
     content: Optional[str] = None
     updated_at: datetime
 
     like_count: int
     comment_count: int
-    tags: Optional[list[ReadTagSchema]] = None
+    tags: Optional[list[TagOut]] = None
 
     liked_by_viewer: Annotated[bool, Field(
         ...,

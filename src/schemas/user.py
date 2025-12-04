@@ -11,7 +11,7 @@ from .GENERAL import Token
 # Bases & Mixins:
 
 
-class _SetPasswordOperationSchema(BaseModel):
+class _SetPasswordOperation(BaseModel):
     password: Annotated[str, Field(
         ..., min_length=8, max_length=64,
         description="Password (no whitespace characters, 8-64 characters)"
@@ -56,8 +56,8 @@ class _CheckUsernamePatternValidatorMixin:
 # --------------------------------------------------------------------
 
 
-class CreateUserSchema(
-    _SetPasswordOperationSchema,
+class UserCreate(
+    _SetPasswordOperation,
     _CheckUsernamePatternValidatorMixin
 ):
     username: Annotated[str, Field(
@@ -69,7 +69,7 @@ class CreateUserSchema(
     )]
 
 
-class UpdateUserSchema(BaseModel, _CheckUsernamePatternValidatorMixin):
+class UserUpdate(BaseModel, _CheckUsernamePatternValidatorMixin):
     username: Annotated[Optional[str], Field(
         None, min_length=3, max_length=64,
         description="Update username: Unique / only: 'a-z' , '0-9' , '_'"
@@ -79,25 +79,25 @@ class UpdateUserSchema(BaseModel, _CheckUsernamePatternValidatorMixin):
     )]
 
 
-class UpdatePasswordSchema(_SetPasswordOperationSchema):
+class UpdatePassword(_SetPasswordOperation):
     old_password: Annotated[str, Field(
         ..., min_length=8, max_length=64,
         description="Password (no whitespace, 8-64 characters)"
     )]
 
 
-class SetPasswordSchema(_SetPasswordOperationSchema):
+class SetPassword(_SetPasswordOperation):
     pass
 
 
-class UserOutSchema(BaseModel):
+class UserOut(BaseModel):
     ID: int
     username: str
 
     model_config = ConfigDict(from_attributes=True)
 
 
-class UserLoginRequestSchema(BaseModel):
+class UserLoginRequest(BaseModel):
     identifier: Annotated[str, Field(
         ..., description="can be 'username' or 'email' of the User"
     )]
@@ -105,7 +105,7 @@ class UserLoginRequestSchema(BaseModel):
 
 
 class LoginSuccessfulData(BaseModel):
-    user: UserOutSchema
+    user: UserOut
     token: Token
 
     model_config = ConfigDict(from_attributes=True)
@@ -114,17 +114,13 @@ class LoginSuccessfulData(BaseModel):
 # --------------------------------------------------------------------
 
 
-class FollowSchema(BaseModel):
-    # user_id: int (will be extracted form auth-token)
-    # -> ID of user who wants to follow another one
+class FollowCreate(BaseModel):
     intended_user_id: Annotated[int, Field(
         ..., ge=1, description="ID of the intended user to 'follow'"
     )]
 
 
 class UnfollowOrRemoveFollowerSchema(BaseModel):
-    # user_id: int (it'll be extracted form auth-token)
-    # -> ID of user who wants to unfollow another one or remove a follower
     operation_type: Annotated[
         Literal["unfollow", "remove"],
         Field(..., description="type of operation: 'unfollow' or 'remove'")
@@ -135,7 +131,7 @@ class UnfollowOrRemoveFollowerSchema(BaseModel):
     )]
 
 
-class FollowerOrFollowingListSchema(BaseModel):
-    users_list: Annotated[Optional[list[UserOutSchema]], Field(
+class FollowerOrFollowingListOut(BaseModel):
+    users_list: Annotated[Optional[list[UserOut]], Field(
         None, description="list of followers or followings"
     )]

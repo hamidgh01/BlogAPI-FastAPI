@@ -1,104 +1,93 @@
 from .user import (
-    CreateUserSchema,
-    UpdateUserSchema,
-    UpdatePasswordSchema,
-    SetPasswordSchema,
-    UserOutSchema,
-    UserLoginRequestSchema,
+    UserCreate,
+    UserUpdate,
+    UpdatePassword,
+    SetPassword,
+    UserOut,
+    UserLoginRequest,
     LoginSuccessfulData,
-    FollowSchema,
+    FollowCreate,
     UnfollowOrRemoveFollowerSchema,
-    FollowerOrFollowingListSchema,
+    FollowerOrFollowingListOut,
 )
 from .post import (
-    CreatePostSchema,
-    UpdatePostSchema,
-    ChangePostPrivacySchema,
-    UpdatePostStatusSchema,
-    ReadTagSchema,
-    PostListSchema,
-    PostDetailsSchema,
-    LikeUnlikePostSchema
+    PostCreate,
+    PostUpdate,
+    ChangePostPrivacy,
+    PostUpdateStatus,
+    TagOut,
+    PostListOut,
+    PostDetailsOut,
+    LikeUnlikePost
 )
-from .ticket import CreateTicketSchema
-from .comment import (
-    CreateCommentSchema,
-    UpdateCommentContentSchema,
-    UpdateCommentStatusSchema,
-    CommentDetailsSchema
-)
+from .ticket import TicketCreate
+from .comment import CommentCreate, CommentUpdate, CommentOut
 from .list import (
-    CreateListSchema,
-    UpdateListSchema,
-    ListListSchema,
-    ListDetailsSchema,
+    ListCreate,
+    ListUpdate,
+    ListListOut,
+    ListDetailsOut,
     SaveOrUnsavePost,
     SaveOrUnsaveList
 )
-from .reports import (
-    CreateReportOnUserSchema,
-    CreateReportOnPostSchema
-)
+from .reports import ReportOnUserIn, ReportOnPostIn
 from .profile import (
-    CreateLinkSchema,
-    UpdateLinkSchema,
+    LinkCreate,
+    LinkUpdate,
     LinkOut,
-    # InitialProfileSchema,
-    UpdateProfileSchema,
-    ProfileListSchema,
+    ProfileUpdate,
+    ProfileListOut,
     ProfileOutAfterUpdate,
-    ProfileDetailsSchema
+    ProfileDetailsOut
 )
 from .GENERAL import Message, Token
 
 
 __all__ = [
     # User Schemas
-    "CreateUserSchema",
-    "UpdateUserSchema",
-    "UpdatePasswordSchema",
-    "SetPasswordSchema",
-    "UserOutSchema",
-    "UserLoginRequestSchema",
+    "UserCreate",
+    "UserUpdate",
+    "UpdatePassword",
+    "SetPassword",
+    "UserOut",
+    "UserLoginRequest",
     "LoginSuccessfulData",
-    "FollowSchema",
+    "FollowCreate",
     "UnfollowOrRemoveFollowerSchema",
-    "FollowerOrFollowingListSchema",
+    "FollowerOrFollowingListOut",
     # Post & Tag Schemas
-    "CreatePostSchema",
-    "UpdatePostSchema",
-    "ChangePostPrivacySchema",
-    "UpdatePostStatusSchema",
-    "ReadTagSchema",
-    "PostListSchema",
-    "PostDetailsSchema",
-    "LikeUnlikePostSchema",
+    "PostCreate",
+    "PostUpdate",
+    "ChangePostPrivacy",
+    "PostUpdateStatus",
+    "TagOut",
+    "PostListOut",
+    "PostDetailsOut",
+    "LikeUnlikePost",
     # Ticket Schemas
-    "CreateTicketSchema",
+    "TicketCreate",
     # Comment Schemas
-    "CreateCommentSchema",
-    "UpdateCommentContentSchema",
-    "UpdateCommentStatusSchema",
-    "CommentDetailsSchema",
+    "CommentCreate",
+    "CommentUpdate",
+    "CommentOut",
     # List Schemas
-    "CreateListSchema",
-    "UpdateListSchema",
-    "ListListSchema",
-    "ListDetailsSchema",
+    "ListCreate",
+    "ListUpdate",
+    "ListListOut",
+    "ListDetailsOut",
     "SaveOrUnsavePost",
     "SaveOrUnsaveList",
     # Reports (on users and posts) Schemas
-    "CreateReportOnUserSchema",
-    "CreateReportOnPostSchema",
+    "ReportOnUserIn",
+    "ReportOnPostIn",
     # Profile & Link Schemas
-    "CreateLinkSchema",
-    "UpdateLinkSchema",
+    "LinkCreate",
+    "LinkUpdate",
     "LinkOut",
-    # "InitialProfileSchema",
-    "UpdateProfileSchema",
-    "ProfileListSchema",
+    "ProfileUpdate",
+    "ProfileListOut",
     "ProfileOutAfterUpdate",
-    "ProfileDetailsSchema",
+    "ProfileDetailsOut",
     # General schemas
     "Message",
     "Token",

@@ -10,7 +10,7 @@ from src.core.exceptions import (
 )
 from src.crud import UserCrud, FollowCrud, ProfileCrud, LinkCrud
 from src.schemas.user import (
-    UserOutSchema, SetPasswordSchema, FollowerOrFollowingListSchema
+    UserOut, SetPassword, FollowerOrFollowingListOut
 )
 from src.schemas.profile import ProfileOutAfterUpdate, LinkOut
 
@@ -19,17 +19,13 @@ if TYPE_CHECKING:
 
     from src.models import User
     from src.schemas.user import (
-        CreateUserSchema,
-        UpdateUserSchema,
-        UpdatePasswordSchema,
-        FollowSchema,
+        UserCreate,
+        UserUpdate,
+        UpdatePassword,
+        FollowCreate,
         UnfollowOrRemoveFollowerSchema,
     )
-    from src.schemas.profile import (
-        UpdateProfileSchema,
-        CreateLinkSchema,
-        UpdateLinkSchema
-    )
+    from src.schemas.profile import ProfileUpdate, LinkCreate, LinkUpdate
 
 
 class UserService:
@@ -43,7 +39,7 @@ class UserService:
     """
 
     @staticmethod
-    async def register_user(data: CreateUserSchema, db: AsyncSession) -> None:
+    async def register_user(data: UserCreate, db: AsyncSession) -> None:
         user = await UserCrud.create(data, db)
         try:
             await ProfileCrud.create(user_id=user.ID, db=db)
@@ -54,39 +50,39 @@ class UserService:
 
     @staticmethod
     async def update_user(
-        current_user: User, data: UpdateUserSchema, db: AsyncSession
-    ) -> UserOutSchema:
+        current_user: User, data: UserUpdate, db: AsyncSession
+    ) -> UserOut:
         user = await UserCrud.update(current_user, data, db)
-        return UserOutSchema.model_validate(user)
+        return UserOut.model_validate(user)
 
     @staticmethod
     async def update_password(
-        current_user: User, data: UpdatePasswordSchema, db: AsyncSession
+        current_user: User, data: UpdatePassword, db: AsyncSession
     ) -> None:
         is_old_password_verified = PasswordHandler.verify_password(
             data.old_password, current_user.password
         )
         if not is_old_password_verified:
             raise BadRequestException("Old password is invalid.")
-        data = SetPasswordSchema(**data.model_dump())
+        data = SetPassword(**data.model_dump())
         await UserCrud.set_new_password(current_user, data, db)
 
     @staticmethod
     async def reset_password_by_email(
-        data: SetPasswordSchema, db: AsyncSession
+        data: SetPassword, db: AsyncSession
     ) -> None:
         pass  # ToDo: add later (need to implement email system)
 
     @staticmethod
     async def update_profile(
-        current_user_id: int, data: UpdateProfileSchema, db: AsyncSession
+        current_user_id: int, data: ProfileUpdate, db: AsyncSession
     ) -> ProfileOutAfterUpdate:
         profile = await ProfileCrud.update(current_user_id, data, db)
         return ProfileOutAfterUpdate.model_validate(profile)
 
     @staticmethod
     async def add_link(
-        current_user_id: int, data: list[CreateLinkSchema], db: AsyncSession
+        current_user_id: int, data: list[LinkCreate], db: AsyncSession
     ) -> list[LinkOut]:
         if not data:
             return []  # ToDo: maybe change here
@@ -97,7 +93,7 @@ class UserService:
 
     @staticmethod
     async def update_link(
-        current_user_id: int, pk: int, data: UpdateLinkSchema, db: AsyncSession
+        current_user_id: int, pk: int, data: LinkUpdate, db: AsyncSession
     ) -> LinkOut:
         updated_link = await LinkCrud.update(current_user_id, pk, data, db)
         if updated_link is None:
@@ -115,7 +111,7 @@ class UserService:
 
     @staticmethod
     async def follow(
-        current_user_id: int, data: FollowSchema, db: AsyncSession
+        current_user_id: int, data: FollowCreate, db: AsyncSession
     ) -> Literal[1, 0]:
         if current_user_id == data.intended_user_id:
             raise BadRequestException("impossible request...!")
@@ -134,19 +130,19 @@ class UserService:
     @staticmethod
     async def get_followers_list(
         user_id: int, db: AsyncSession
-    ) -> FollowerOrFollowingListSchema:
+    ) -> FollowerOrFollowingListOut:
         result = await FollowCrud.retrieve_followers(user_id, db)
-        return FollowerOrFollowingListSchema(users_list=list(
-            map(lambda row: UserOutSchema(ID=row[0], username=row[1]), result)
+        return FollowerOrFollowingListOut(users_list=list(
+            map(lambda row: UserOut(ID=row[0], username=row[1]), result)
         ))
 
     @staticmethod
     async def get_followings_list(
         user_id: int, db: AsyncSession
-    ) -> FollowerOrFollowingListSchema:
+    ) -> FollowerOrFollowingListOut:
         result = await FollowCrud.retrieve_followings(user_id, db)
-        return FollowerOrFollowingListSchema(users_list=list(
-            map(lambda row: UserOutSchema(ID=row[0], username=row[1]), result)
+        return FollowerOrFollowingListOut(users_list=list(
+            map(lambda row: UserOut(ID=row[0], username=row[1]), result)
         ))
 
     # @staticmethod

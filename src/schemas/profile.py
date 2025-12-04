@@ -6,13 +6,13 @@ from datetime import date
 from pydantic import BaseModel, Field, HttpUrl, ConfigDict
 
 from src.models import Gender
-from .user import UserOutSchema
+from .user import UserOut
 
 # ----------------------------------------------------------
 # Link Schemas (part of Profile)
 
 
-class CreateLinkSchema(BaseModel):
+class LinkCreate(BaseModel):
     title: Annotated[str, Field(..., max_length=64, description="Link title")]
     url: Annotated[HttpUrl, Field(
         ..., description="Valid URL (scheme: 'http://' or 'https://')"
@@ -22,7 +22,7 @@ class CreateLinkSchema(BaseModel):
     )]
 
 
-class UpdateLinkSchema(BaseModel):
+class LinkUpdate(BaseModel):
     title: Annotated[Optional[str], Field(
         None, max_length=64, description="Link title"
     )]
@@ -36,7 +36,7 @@ class UpdateLinkSchema(BaseModel):
     # if link_owner_id == id from auth-token
 
 
-class LinkOut(CreateLinkSchema):
+class LinkOut(LinkCreate):
     ID: Annotated[int, Field(..., description="Unique link ID")]
     model_config = ConfigDict(from_attributes=True)
 
@@ -45,7 +45,7 @@ class LinkOut(CreateLinkSchema):
 # Profile Schemas
 
 
-class UpdateProfileSchema(BaseModel):
+class ProfileUpdate(BaseModel):
     display_name: Annotated[Optional[str], Field(
         None, max_length=64, description="Display name (optional)"
     )]
@@ -61,11 +61,11 @@ class UpdateProfileSchema(BaseModel):
     )]
 
 
-class ProfileListSchema(BaseModel):
+class ProfileListOut(BaseModel):
     """ NOTE: this schema includes field from both User and Profile models """
     user_id: Annotated[int, Field(..., description="PK of profile (User ID)")]
     display_name: Optional[str] = None
-    user: Annotated[UserOutSchema, Field(
+    user: Annotated[UserOut, Field(
         ..., description="Contains 'username' and 'id' of User model"
     )]
     # profile_photo
@@ -85,9 +85,9 @@ class ProfileOutAfterUpdate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ProfileDetailsSchema(ProfileOutAfterUpdate):
+class ProfileDetailsOut(ProfileOutAfterUpdate):
     """ NOTE: this schema includes field from both User and Profile models """
-    user: Annotated[UserOutSchema, Field(
+    user: Annotated[UserOut, Field(
         ..., description="Contains 'username' and 'id' of User model"
     )]
     links: Annotated[Optional[list[LinkOut]], Field(

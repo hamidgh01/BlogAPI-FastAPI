@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 from src.models import UserReportTitleChoices, PostReportTitleChoices
 
 
-class CreateReportOnUserSchema(BaseModel):
+class ReportOnUserIn(BaseModel):
     title: Annotated[UserReportTitleChoices, Field(
         ..., description="Report reason enum for users"
     )]
@@ -20,7 +20,7 @@ class CreateReportOnUserSchema(BaseModel):
     # reporter_id from auth-token
 
 
-class CreateReportOnPostSchema(BaseModel):
+class ReportOnPostIn(BaseModel):
     title: Annotated[PostReportTitleChoices, Field(
         ..., description="Report reason enum for posts"
     )]

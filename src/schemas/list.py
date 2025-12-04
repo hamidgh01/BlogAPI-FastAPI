@@ -6,7 +6,7 @@ from datetime import datetime
 from pydantic import BaseModel, Field, ConfigDict
 
 
-class CreateListSchema(BaseModel):
+class ListCreate(BaseModel):
     # user_id (owner) assigned from auth-token
     title: Annotated[str, Field(
         ..., min_length=2, max_length=120, description="List title"
@@ -23,7 +23,7 @@ class CreateListSchema(BaseModel):
     # post_ids: Annotated[Optional[List[int]], Field(...)]  # (maybe)
 
 
-class UpdateListSchema(BaseModel):
+class ListUpdate(BaseModel):
     title: Annotated[Optional[str], Field(
         None, min_length=2, max_length=120, description="List title"
     )]
@@ -35,7 +35,7 @@ class UpdateListSchema(BaseModel):
     )]
 
 
-class ListListSchema(BaseModel):
+class ListListOut(BaseModel):
     ID: int
     title: str
     is_private: bool
@@ -51,7 +51,7 @@ class ListListSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ListDetailsSchema(ListListSchema):
+class ListDetailsOut(ListListOut):
     description: Optional[str] = None
 
 

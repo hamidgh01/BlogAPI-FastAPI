@@ -6,7 +6,7 @@ from src.core.config import settings
 from src.core.exceptions import UnauthenticatedException
 from src.auth import JWTHandler, TokenRevocation
 from src.crud import UserCrud
-from src.schemas.user import LoginSuccessfulData, UserOutSchema
+from src.schemas.user import LoginSuccessfulData, UserOut
 from src.schemas.GENERAL import Token
 
 if TYPE_CHECKING:
@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
     from redis.asyncio import Redis
 
-    from src.schemas.user import UserLoginRequestSchema
+    from src.schemas.user import UserLoginRequest
 
 
 class AuthService:
@@ -25,7 +25,7 @@ class AuthService:
     async def login(
         request: Request,
         response: Response,
-        data: UserLoginRequestSchema,
+        data: UserLoginRequest,
         redis: Redis,
         db: AsyncSession
     ) -> LoginSuccessfulData:
@@ -47,7 +47,7 @@ class AuthService:
                 "Invalid username, email or password"
             )
 
-        user = UserOutSchema.model_validate(user)
+        user = UserOut.model_validate(user)
         access_token = JWTHandler.generate_token(user.ID, "access")
         refresh_token = JWTHandler.generate_token(user.ID, "refresh")
 

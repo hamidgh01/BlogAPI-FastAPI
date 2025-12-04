@@ -1,62 +1,40 @@
 """ Schemas (Pydantic models) for 'Comment' Model """
 
-from typing import Annotated, Optional
+from typing import Annotated, Optional, Literal
 from datetime import datetime
-from enum import Enum
 
 from pydantic import BaseModel, Field, ConfigDict
 
-from src.models import CommentStatus
 
-
-class ParentType(Enum):
-    P = "post"
-    C = "comment"
-
-
-class CreateCommentSchema(BaseModel):
+class CommentCreate(BaseModel):
     content: Annotated[str, Field(
         ..., min_length=1, max_length=1000, description="comment content"
     )]
-    parent_type: Annotated[ParentType, Field(
-        ..., description="specifies parent-type (can be 'post' or 'comment')"
-    )]
+    parent_type: Annotated[
+        Literal["post", "comment"],
+        Field(..., description="specifies parent-type ('post' or 'comment')")
+    ]
     parent_id: Annotated[int, Field(
         ..., description="ID of parent-obj ('post_id' or 'comment_id')"
     )]
 
 
-class UpdateCommentContentSchema(BaseModel):
+class CommentUpdate(BaseModel):
     content: Annotated[Optional[str], Field(
         None, min_length=1, max_length=1000, description="updated content"
     )]
 
 
-class UpdateCommentStatusSchema(BaseModel):
-    """ this Schema is used when:
-    _ admin 'hides' a comment  -> "Hidden-by-Admin"
-    _ admin 'unhide' a comment  -> "published"
-    _ commenter 'deletes' his/her comment  -> "Deleted-By-Commenter" """
-
-    status: Annotated[CommentStatus, Field(
-        ..., description="Comment status enum: "
-                         "published / Hidden-by-Admin / Deleted-By-Commenter"
-    )]
-
-
-class CommentDetailsSchema(BaseModel):
+class CommentOut(BaseModel):
     ID: int
     user_id: int
     content: str
-    status: Annotated[CommentStatus, Field(
-        ..., description="Comment status enum: "
-                         "published / Hidden-by-Admin / Deleted-By-Commenter"
-    )]
     created_at: datetime
     updated_at: datetime
-    parent_type: Annotated[ParentType, Field(
-        ..., description="specifies parent-type (can be 'post' or 'comment')"
-    )]
+    parent_type: Annotated[
+        Literal["post", "comment"],
+        Field(..., description="specifies parent-type ('post' or 'comment')")
+    ]
     parent_id: Annotated[int, Field(
         ..., description="ID of parent-obj ('post_id' or 'comment_id')"
     )]

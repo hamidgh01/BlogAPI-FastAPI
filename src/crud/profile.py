@@ -12,11 +12,7 @@ from .utils import handle_unexpected_db_error
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
-    from src.schemas.profile import (
-        UpdateProfileSchema,
-        CreateLinkSchema,
-        UpdateLinkSchema,
-    )
+    from src.schemas.profile import ProfileUpdate, LinkCreate, LinkUpdate
 
 
 class ProfileCrud:
@@ -40,7 +36,7 @@ class ProfileCrud:
 
     @staticmethod
     async def update(
-        current_user_id: int, data: UpdateProfileSchema, db: AsyncSession
+        current_user_id: int, data: ProfileUpdate, db: AsyncSession
     ) -> Profile:
         data = data.model_dump(exclude_none=True)
         if not data:
@@ -76,9 +72,7 @@ class LinkCrud:
     """ CRUD operations for Link model """
 
     @staticmethod
-    async def create(
-        links: list[CreateLinkSchema], db: AsyncSession
-    ) -> list[Link]:
+    async def create(links: list[LinkCreate], db: AsyncSession) -> list[Link]:
         try:
             links = [link.model_dump() for link in links]
             for dictionary in links:
@@ -94,7 +88,7 @@ class LinkCrud:
 
     @staticmethod
     async def update(
-        current_user_id: int, pk: int, data: UpdateLinkSchema, db: AsyncSession
+        current_user_id: int, pk: int, data: LinkUpdate, db: AsyncSession
     ) -> Link | None:
         data = data.model_dump(exclude_none=True)
         if len(data) <= 1:  # profile_id is required, so `len` at least = 1

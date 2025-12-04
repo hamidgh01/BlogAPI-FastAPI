@@ -22,7 +22,7 @@ router = APIRouter()
 
 @router.post("/register", status_code=status.HTTP_201_CREATED)
 async def register_user(
-    data: user_sch.CreateUserSchema,
+    data: user_sch.UserCreate,
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ) -> Message:
     await UserService.register_user(data, db)
@@ -33,7 +33,7 @@ async def register_user(
 async def login(
     request: Request,
     response: Response,
-    data: user_sch.UserLoginRequestSchema,
+    data: user_sch.UserLoginRequest,
     redis: Annotated[Redis, Depends(deps.get_redis)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ) -> user_sch.LoginSuccessfulData:
@@ -62,16 +62,16 @@ async def renew_tokens(
 
 @router.put("/user", status_code=status.HTTP_202_ACCEPTED)
 async def update_user(
-    data: user_sch.UpdateUserSchema,
+    data: user_sch.UserUpdate,
     current_user: Annotated[User, Depends(deps.get_current_user_object)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
-) -> user_sch.UserOutSchema:
+) -> user_sch.UserOut:
     return await UserService.update_user(current_user, data, db)
 
 
 @router.put("/password", status_code=status.HTTP_202_ACCEPTED)
 async def update_password(
-    data: user_sch.UpdatePasswordSchema,
+    data: user_sch.UpdatePassword,
     current_user: Annotated[User, Depends(deps.get_current_user_object)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ) -> Message:
@@ -85,7 +85,7 @@ async def update_password(
 
 @router.put("/profile", status_code=status.HTTP_202_ACCEPTED)
 async def update_profile(
-    data: profile_sch.UpdateProfileSchema,
+    data: profile_sch.ProfileUpdate,
     current_user_id: Annotated[int, Depends(deps.get_current_user_id)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ) -> profile_sch.ProfileOutAfterUpdate:
@@ -94,7 +94,7 @@ async def update_profile(
 
 @router.post("/link", status_code=status.HTTP_201_CREATED)
 async def add_link(
-    data: list[profile_sch.CreateLinkSchema],
+    data: list[profile_sch.LinkCreate],
     current_user_id: Annotated[int, Depends(deps.get_current_user_id)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ) -> list[profile_sch.LinkOut]:
@@ -104,7 +104,7 @@ async def add_link(
 @router.put("/link/{pk}", status_code=status.HTTP_202_ACCEPTED)
 async def update_link(
     pk: Annotated[int, Path(..., gt=0, description="unique ID of link")],
-    data: profile_sch.UpdateLinkSchema,
+    data: profile_sch.LinkUpdate,
     current_user_id: Annotated[int, Depends(deps.get_current_user_id)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ) -> profile_sch.LinkOut:
@@ -131,7 +131,7 @@ async def delete_link(
 
 @router.post("/follow", status_code=status.HTTP_201_CREATED)
 async def follow(
-    data: user_sch.FollowSchema,
+    data: user_sch.FollowCreate,
     current_user_id: Annotated[int, Depends(deps.get_current_user_id)],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
 ) -> Message:
@@ -168,7 +168,7 @@ async def followers_list(
         description="ID of the user whose followers-list is being requested"
     )],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
-) -> user_sch.FollowerOrFollowingListSchema:
+) -> user_sch.FollowerOrFollowingListOut:
     return await UserService.get_followers_list(user_id, db)
 
 
@@ -180,5 +180,5 @@ async def followings_list(
         description="ID of the user whose followings-list is being requested"
     )],
     db: Annotated[AsyncSession, Depends(deps.get_db)]
-) -> user_sch.FollowerOrFollowingListSchema:
+) -> user_sch.FollowerOrFollowingListOut:
     return await UserService.get_followings_list(user_id, db)

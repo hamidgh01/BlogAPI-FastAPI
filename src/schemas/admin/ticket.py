@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field, ConfigDict
 from src.models import TicketStatus
 
 
-class TicketListSchema(BaseModel):
+class TicketListOut(BaseModel):
     ID: int
     subject: Optional[str] = None
     status: Annotated[TicketStatus, Field(
@@ -22,11 +22,11 @@ class TicketListSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class TicketDetailsSchema(TicketListSchema):
+class TicketDetailsOut(TicketListOut):
     message: str
 
 
-class UpdateTicketStatusSchema(BaseModel):
+class TicketUpdateStatus(BaseModel):
     status: Annotated[TicketStatus, Field(
         ..., description="Ticket status enum: unread / read / closed"
     )]

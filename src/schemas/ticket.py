@@ -5,7 +5,7 @@ from typing import Annotated, Optional
 from pydantic import BaseModel, Field
 
 
-class CreateTicketSchema(BaseModel):
+class TicketCreate(BaseModel):
     subject: Annotated[Optional[str], Field(
         None, max_length=120, description="Ticket subject (optional)"
     )]

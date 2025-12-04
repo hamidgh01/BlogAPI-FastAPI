@@ -6,17 +6,17 @@ from datetime import datetime, date
 from pydantic import BaseModel, Field, ConfigDict
 
 from src.models import Gender
-from .user import UserListSchema, UserDetailsForAdminSchema
+from .user import UserListOut, UserOutForAdmin
 from ..profile import LinkOut
 
 
-class ProfileListForAdminPanelSchema(BaseModel):
+class ProfileListOutForAdmin(BaseModel):
     """ NOTE: this schema includes field from both User and Profile models """
     user_id: Annotated[int, Field(..., description="PK of profile (User ID)")]
     display_name: Optional[str] = None
     created_at: datetime
     gender: Gender
-    user: Annotated[UserListSchema, Field(
+    user: Annotated[UserListOut, Field(
         ...,
         description="Contains username, id, is_active & is_superuser of User"
     )]
@@ -24,7 +24,7 @@ class ProfileListForAdminPanelSchema(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class ProfileDetailsForAdminPanelSchema(ProfileListForAdminPanelSchema):
+class ProfileDetailsOutForAdmin(ProfileListOutForAdmin):
     """ NOTE: this schema includes field from both User and Profile models """
     about: Optional[str] = None
     updated_at: datetime  # Profile.updated_at
@@ -34,7 +34,7 @@ class ProfileDetailsForAdminPanelSchema(ProfileListForAdminPanelSchema):
     )]
 
     # NOTE: overriding 'user' from ProfileListForAdminPanelSchema
-    user: Annotated[UserDetailsForAdminSchema, Field(
+    user: Annotated[UserOutForAdmin, Field(
         ...,
         description="Contains username, id, is_active, is_superuser, email,"
                     "created_at & updated_at of User model"
