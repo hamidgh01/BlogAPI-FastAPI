@@ -5,11 +5,11 @@ from fastapi import FastAPI
 from src.core.redis import init_redis, close_redis
 from src.core.exceptions import CustomException
 from src.utils.exception_handlers import custom_exception_handler
-from src.routes import user, post
+from src.routes import user, post, comment
 from src.routes.admin import admin_router
 
 
-all_routers = [user.router, post.router, admin_router]
+all_routers = [user.router, post.router, comment.router, admin_router]
 
 
 @asynccontextmanager

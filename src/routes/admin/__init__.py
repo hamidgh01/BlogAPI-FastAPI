@@ -5,7 +5,7 @@ other users don't have access them)
 """
 
 from ._admin_router import admin_router
-from . import post
+from . import post, comment
 
 
 __all__ = ["admin_router"]

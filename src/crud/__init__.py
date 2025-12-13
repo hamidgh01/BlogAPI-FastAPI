@@ -1,6 +1,7 @@
 from .user import UserCrud, FollowCrud
 from .profile import ProfileCrud, LinkCrud
 from .post import PostCrud, TagCrud, PostTagAssociation
+from .comment import CommentCrud
 
 
 __all__ = [
@@ -11,4 +12,5 @@ __all__ = [
     "PostCrud",
     "TagCrud",
     "PostTagAssociation",
+    "CommentCrud",
 ]

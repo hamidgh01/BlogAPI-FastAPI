@@ -21,7 +21,7 @@ class CommentCreate(BaseModel):
 
 class CommentUpdate(BaseModel):
     content: Annotated[Optional[str], Field(
-        None, min_length=1, max_length=1000, description="updated content"
+        ..., min_length=1, max_length=1000, description="updated content"
     )]
 
 
@@ -31,12 +31,7 @@ class CommentOut(BaseModel):
     content: str
     created_at: datetime
     updated_at: datetime
-    parent_type: Annotated[
-        Literal["post", "comment"],
-        Field(..., description="specifies parent-type ('post' or 'comment')")
-    ]
-    parent_id: Annotated[int, Field(
-        ..., description="ID of parent-obj ('post_id' or 'comment_id')"
-    )]
+    comment_parent_id: Optional[int] = None
+    post_parent_id: Optional[int] = None
 
     model_config = ConfigDict(from_attributes=True)
