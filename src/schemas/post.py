@@ -23,10 +23,8 @@ def validate_tag_name(value: str) -> str:
     return value
 
 
-class _BaseForPostCreateAndUpdate(BaseModel):
-    content: Annotated[Optional[str], Field(
-        None, description="Post content (text)"
-    )]
+class TagsIn(BaseModel):
+
     tags: Annotated[Optional[list[str]], Field(
         default_factory=list,
         description="List of tag_names\n"
@@ -47,6 +45,18 @@ class _BaseForPostCreateAndUpdate(BaseModel):
             raise ValueError("maximum number of tags: 5")
         return [validate_tag_name(tag) for tag in tags]
 
+
+class PostCreate(TagsIn):
+    title: Annotated[str, Field(
+        ..., min_length=2, max_length=250, description="Post title"
+    )]
+    content: Annotated[Optional[str], Field(
+        None, description="Post content (text)"
+    )]
+    is_private: Annotated[bool, Field(
+        default=False, description="being Private/Public (default: public)"
+    )]
+
     @computed_field
     def reading_time(self) -> int | None:
         """ calculate reading time (in seconds) based on content length """
@@ -61,19 +71,26 @@ class _BaseForPostCreateAndUpdate(BaseModel):
         return max(1, seconds)
 
 
-class PostCreate(_BaseForPostCreateAndUpdate):
-    title: Annotated[str, Field(
-        ..., min_length=2, max_length=250, description="Post title"
-    )]
-    is_private: Annotated[bool, Field(
-        default=False, description="being Private/Public (default: public)"
-    )]
-
-
-class PostUpdate(_BaseForPostCreateAndUpdate):
+class PostUpdate(BaseModel):
     title: Annotated[Optional[str], Field(
         None, min_length=2, max_length=250, description="Post title"
     )]
+    content: Annotated[Optional[str], Field(
+        None, description="Post content (text)"
+    )]
+
+    @computed_field
+    def reading_time(self) -> int | None:
+        """ calculate reading time (in seconds) based on content length """
+        if self.content is None:
+            return None
+        if not self.content:
+            return 1
+        wpm = 200  # default reading speed is 200 words per minute (wpm)
+        word_count = len(self.content.split())
+        seconds = int((word_count / wpm) * 60)
+
+        return max(1, seconds)
 
 
 class ChangePostPrivacy(BaseModel):
@@ -101,7 +118,7 @@ class TagOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
-class DraftPostOut(BaseModel):
+class PostOut(BaseModel):
     ID: int
     title: str
     content: Optional[str] = None
@@ -111,8 +128,6 @@ class DraftPostOut(BaseModel):
     created_at: datetime
     updated_at: datetime
     published_at: Optional[datetime] = None
-
-    tags: Optional[list[TagOut]] = None
 
     model_config = ConfigDict(from_attributes=True)
 

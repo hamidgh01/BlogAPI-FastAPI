@@ -53,6 +53,5 @@ async def get_current_user_object(
 async def authenticate_admin(
     user: Annotated[User, Depends(get_current_user_object)]
 ) -> User:
-    if user.is_superuser:
-        return user
-    raise ForbiddenException("Forbidden access to endpoint.")
+    if not user.is_superuser:
+        raise ForbiddenException("Forbidden access to endpoint.")

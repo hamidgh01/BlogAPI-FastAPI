@@ -11,11 +11,13 @@ from .user import (
     FollowerOrFollowingListOut,
 )
 from .post import (
+    TagsIn,
     PostCreate,
     PostUpdate,
     ChangePostPrivacy,
     PostUpdateStatus,
     TagOut,
+    PostOut,
     PostListOut,
     PostDetailsOut,
     LikeUnlikePost
@@ -56,11 +58,13 @@ __all__ = [
     "UnfollowOrRemoveFollowerSchema",
     "FollowerOrFollowingListOut",
     # Post & Tag Schemas
+    "TagsIn",
     "PostCreate",
     "PostUpdate",
     "ChangePostPrivacy",
     "PostUpdateStatus",
     "TagOut",
+    "PostOut",
     "PostListOut",
     "PostDetailsOut",
     "LikeUnlikePost",
