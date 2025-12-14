@@ -3,9 +3,7 @@ from typing import TYPE_CHECKING, Literal, Optional
 
 from sqlalchemy import select, delete, or_, and_, desc
 from sqlalchemy.dialects.postgresql import insert as pg_insert
-from sqlalchemy.exc import (
-    IntegrityError, MultipleResultsFound, SQLAlchemyError
-)
+from sqlalchemy.exc import IntegrityError, MultipleResultsFound
 
 from src.models import User, follows
 from src.core.security import PasswordHandler
@@ -36,6 +34,7 @@ class UserCrud:
     """ CRUD operations for User model """
 
     @staticmethod
+    @handle_unexpected_db_error("create user")
     async def create(data: UserCreate, db: AsyncSession) -> User:
         try:
             data = data.model_dump(exclude={"confirm_password"})
@@ -56,10 +55,8 @@ class UserCrud:
             msg = "Failed to create `User`! unexpected integrity error."
             raise InternalServerError(msg) from err
 
-        except SQLAlchemyError as err:
-            await handle_unexpected_db_error(db, "create `User`", err)
-
     @staticmethod
+    @handle_unexpected_db_error("update user")
     async def update(user: User, data: UserUpdate, db: AsyncSession) -> User:
         data = data.model_dump(exclude_none=True)
         if not data:
@@ -81,34 +78,27 @@ class UserCrud:
             msg = "Failed to update `User`! unexpected integrity error."
             raise InternalServerError(msg) from err
 
-        except SQLAlchemyError as err:
-            await handle_unexpected_db_error(db, "update `User`", err)
-
     @staticmethod
+    @handle_unexpected_db_error("set new password")
     async def set_new_password(
         user: User, data: SetPassword, db: AsyncSession
     ) -> None:
-        try:
-            new_password_hash = PasswordHandler.hash_password(data.password)
-            user.password = new_password_hash
-            await db.commit()
-        except SQLAlchemyError as err:
-            await handle_unexpected_db_error(db, "set new password", err)
+        new_password_hash = PasswordHandler.hash_password(data.password)
+        user.password = new_password_hash
+        await db.commit()
 
     @staticmethod
+    @handle_unexpected_db_error("verify user for login")
     async def verify_user_for_login(
         data: UserLoginRequest, db: AsyncSession
     ) -> User | None:
         query = select(User).where(or_(
             User.username == data.identifier, User.email == data.identifier
         ))  # NOTE: data.identifier is whether `username` or `email`
-        try:
-            result = await db.execute(query)
-            user: Optional[User] = result.scalar_one_or_none()
-            if user is None:
-                return
-        except SQLAlchemyError as err:
-            await handle_unexpected_db_error(db, "verify user for login", err)
+        result = await db.execute(query)
+        user: Optional[User] = result.scalar_one_or_none()
+        if user is None:
+            return
 
         is_password_verified = PasswordHandler.verify_password(
             plain_password=data.password, hashed_password=user.password
@@ -119,14 +109,13 @@ class UserCrud:
         return user
 
     @staticmethod
+    @handle_unexpected_db_error("delete user")
     async def delete(user: User, db: AsyncSession) -> None:
-        try:
-            await db.delete(user)
-            await db.commit()
-        except SQLAlchemyError as err:
-            await handle_unexpected_db_error(db, "delete `User`", err)
+        await db.delete(user)
+        await db.commit()
 
     @staticmethod
+    @handle_unexpected_db_error("get user by 'id'")
     async def get_by_id(pk: int, db: AsyncSession) -> User:  # ToDo: change it to: [id, username]
         user = await db.get(User, pk)
         if user is None:
@@ -134,10 +123,12 @@ class UserCrud:
         return user
 
     @staticmethod
+    @handle_unexpected_db_error("get user by 'username'")
     async def get_by_username(username: str, db: AsyncSession) -> User:
         return await UserCrud._get_user_by_unique_field("username", username, db)
 
     @staticmethod
+    @handle_unexpected_db_error("get user by 'email'")
     async def get_by_email(email: EmailStr, db: AsyncSession) -> User:
         return await UserCrud._get_user_by_unique_field("email", email, db)
 
@@ -203,6 +194,7 @@ class FollowCrud:
     """ CRUD operations for 'follows' table """
 
     @staticmethod
+    @handle_unexpected_db_error("add follow relation")
     async def create(
         current_user_id: int, data: FollowCreate, db: AsyncSession
     ) -> Literal[1, 0]:
@@ -219,10 +211,9 @@ class FollowCrud:
                 raise BadRequestException(
                     f"there's no user with pk={data.intended_user_id}."
                 )
-        except SQLAlchemyError as err:
-            await handle_unexpected_db_error(db, "add follow relation", err)
 
     @staticmethod
+    @handle_unexpected_db_error("delete follow relation")
     async def delete(
         current_user_id: int,
         data: UnfollowOrRemoveFollowerSchema,
@@ -242,15 +233,13 @@ class FollowCrud:
                 )
             case _:
                 raise BadRequestException("invalid operation-type input!")
-        try:
-            query = delete(follows).where(and_clause)
-            result = await db.execute(query)
-            await db.commit()
-            return result.rowcount  # Literal[1, 0]
-        except SQLAlchemyError as err:
-            await handle_unexpected_db_error(db, "delete follow relation", err)
+        query = delete(follows).where(and_clause)
+        result = await db.execute(query)
+        await db.commit()
+        return result.rowcount  # Literal[1, 0]
 
     @staticmethod
+    @handle_unexpected_db_error("get followers-list")
     async def retrieve_followers(
         user_id: int, db: AsyncSession
     ) -> list[tuple[int, str]]:  # [(id, username), (id, username), ...]
@@ -260,14 +249,12 @@ class FollowCrud:
             .where(follows.c.followed == user_id)
             .order_by(desc(follows.c.follow_at))
         )
-        try:
-            rows = (await db.execute(query)).all()
-            await db.commit()
-            return rows
-        except SQLAlchemyError as err:
-            await handle_unexpected_db_error(db, "get followers-list", err)
+        rows = (await db.execute(query)).all()
+        await db.commit()
+        return rows
 
     @staticmethod
+    @handle_unexpected_db_error("get followings-list")
     async def retrieve_followings(
         user_id: int, db: AsyncSession
     ) -> list[tuple[int, str]]:  # [(id, username), (id, username), ...]
@@ -277,9 +264,6 @@ class FollowCrud:
             .where(follows.c.followed_by == user_id)
             .order_by(desc(follows.c.follow_at))
         )
-        try:
-            rows = (await db.execute(query)).all()
-            await db.commit()
-            return rows
-        except SQLAlchemyError as err:
-            await handle_unexpected_db_error(db, "get followings-list", err)
+        rows = (await db.execute(query)).all()
+        await db.commit()
+        return rows

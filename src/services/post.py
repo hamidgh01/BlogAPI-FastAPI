@@ -57,8 +57,11 @@ class PostService:
     ) -> PostDetailsOut:
         post = await PostCrud.publish_draft(current_user_id, pk, db)
         if post is None:
-            raise NotFoundException("Invalid request!")
-            # due to: ownership / trying to republish / published deleted post
+            raise NotFoundException(
+                f"Requester(pk='{current_user_id}') is not owner of "
+                f"any Draft-Post with pk='{pk}'"
+            )
+            # reason: ownership / trying to republish / published deleted post
 
         author: User = await UserCrud.get_by_id(post.user_id, db)
         tag_objects = await TagCrud.get_tags_of_a_post(post.ID, db)
