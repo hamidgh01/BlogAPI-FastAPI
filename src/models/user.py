@@ -10,15 +10,7 @@ from .lists import user_saved_lists
 from .interactions import follows, post_likes
 
 if TYPE_CHECKING:
-    from . import (
-        Profile,
-        Post,
-        Comment,
-        List,
-        Ticket,
-        ReportOnUser,
-        ReportOnPost
-    )
+    from . import Profile, Post, Comment, List
 
 
 class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
@@ -41,15 +33,6 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     _ N:N (Many to Many) with 'List' (saved-lists)
       -> User.saved_lists / List.users_who_saved_this_list
       (via 'user_saved_lists' association table)
-    _ 1:N (One to Many) with 'Ticket' -> User.tickets / Ticket.sender
-    relations with 'ReportOnUser':
-        _ 1:N (One to Many) with 'ReportOnUser' (as reporter)
-          -> User.reports_on_users / ReportOnUser.reporter
-        _ 1:N (One to Many) with 'ReportOnUser' (as reported_user)
-          -> User.received_reports / ReportOnUser.reported_user
-    relation with 'ReportOnPost':
-        _ 1:N (One to Many) with 'ReportOnPost' (as reporter)
-          -> User.reports_on_posts / ReportOnPost.reporter
     _ N:N (Many to Many) with 'User' (itself) (follow-system)
       -> User.followings / User.followers (via 'follows' association table)
     _ N:N (Many to Many) with 'Post' (like-system)
@@ -94,28 +77,6 @@ class User(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     # 1:1 with Profile
     profile: Mapped[Profile] = relationship(
         "Profile", backref="user", uselist=False
-    )
-    # 1:N with Ticket
-    tickets: Mapped[list[Ticket]] = relationship(
-        "Ticket", backref="sender"
-    )
-    # ------------------------------------------------------
-    # 1:N with ReportOnUser (as reporter -reports this user created-)
-    reports_on_users: Mapped[list[ReportOnUser]] = relationship(
-        "ReportOnUser",
-        foreign_keys='ReportOnUser.reporter_id',  # which FK to use
-        backref="reporter",
-    )
-    # 1:N with ReportOnUser (as reported_user -reports made against this user-)
-    received_reports: Mapped[list[ReportOnUser]] = relationship(
-        "ReportOnUser",
-        foreign_keys='ReportOnUser.reported_user_id',  # which FK to use
-        backref="reported_user"
-    )
-    # ---------------------------------------
-    # 1:N with ReportOnPost (as reporter)
-    reports_on_posts: Mapped[list[ReportOnPost]] = relationship(
-        "ReportOnPost", backref="reporter"
     )
     # ------------------------------------------------------
     # N:N with User itself (Follower:Following) ('follows' association table)

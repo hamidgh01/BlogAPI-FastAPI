@@ -16,7 +16,7 @@ from .lists import saved_posts
 from .interactions import post_likes
 
 if TYPE_CHECKING:
-    from . import User, Tag, Comment, List, ReportOnPost
+    from . import User, Tag, Comment, List
 
 
 class PostStatus(PythonEnum):
@@ -43,8 +43,6 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
     _ 1:N (One to Many) with 'Comment' -> Post.comments / Comment.post
     _ N:N (Many to Many) with 'List' -> Post.lists / List.posts
       (via 'saved_posts' association table)
-    _ 1:N (One to Many) with 'ReportOnPost'
-      ->  Post.received_reports / ReportOnPost.reported_post
     _ N:N (Many to Many) with 'User' (like-system)
       -> Post.likers / User.liked_posts (via 'post_likes' association table)
     """
@@ -103,10 +101,6 @@ class Post(Base, CreatedAtFieldMixin, UpdateAtFieldMixin):
         "User",
         secondary=post_likes,
         back_populates="liked_posts"
-    )
-    # 1:N with ReportOnPost
-    received_reports: Mapped[list[ReportOnPost]] = relationship(
-        "ReportOnPost", backref="reported_post"
     )
 
     # ToDo: add 'pin' column with limitation=10 (for example)
